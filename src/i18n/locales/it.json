@@ -293,14 +293,7 @@
     "chartFuel": "Carburante",
     "chartMaintenance": "Manutenzione",
     "chartExpenses": "Spese (bollo/assic./multe)",
-    "charging": "Ricarica",
-    "distance": "Km registrati",
-    "consumption": "Consumo medio",
-    "energy": "Energia ricaricata",
-    "averageEnergyPrice": "Prezzo medio energia",
-    "dataQualityTitle": "Qualità dei dati",
-    "dataQualityConsumption": "Consumo calcolato su {{count}} intervalli tra pieni.",
-    "dataQualityHint": "Registra almeno due rifornimenti segnati come pieno per ottenere un consumo medio affidabile."
+    "charging": "Ricarica"
   },
   "backupPanel": {
     "noBackupYet": "Non hai ancora fatto un backup",
@@ -634,14 +627,7 @@
     "stats": "Statistiche",
     "garage": "Garage",
     "fuel": "Rifornimento",
-    "charging": "Ricarica",
-    "distance": "Km registrati",
-    "consumption": "Consumo medio",
-    "energy": "Energia ricaricata",
-    "averageEnergyPrice": "Prezzo medio energia",
-    "dataQualityTitle": "Qualità dei dati",
-    "dataQualityConsumption": "Consumo calcolato su {{count}} intervalli tra pieni.",
-    "dataQualityHint": "Registra almeno due rifornimenti segnati come pieno per ottenere un consumo medio affidabile."
+    "charging": "Ricarica"
   },
   "dashboardGarage": {
     "heroLabel": "Il tuo garage,",
@@ -659,13 +645,7 @@
     "reminderInKm": "{{label}} tra {{km}}",
     "reminderOverdue": "{{label}} scaduto",
     "manage": "Gestisci",
-    "heroButtonFuel": "Aggiungi rifornimento",
-    "actionsNeeded": "attenzioni da controllare",
-    "quickActions": "Azioni rapide",
-    "updateKm": "Aggiorna km",
-    "monthCost": "Spese questo mese",
-    "openItems": "Interventi registrati",
-    "urgent": "Scadenze"
+    "heroButtonFuel": "Aggiungi rifornimento"
   },
   "premium": {
     "title": "Diario Auto Premium",

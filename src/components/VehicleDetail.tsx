@@ -20,7 +20,6 @@ import ChargingForm from "./ChargingForm";
 import ChargingList from "./ChargingList";
 import MaintenanceForm from "./MaintenanceForm";
 import MaintenanceList from "./MaintenanceList";
-import MaintenanceOverview from "./MaintenanceOverview";
 import PremiumScreen from "./PremiumScreen";
 import CategoryIcon from "./CategoryIcon";
 import ExpenseForm from "./ExpenseForm";
@@ -213,25 +212,6 @@ export default function VehicleDetail({
     filteredCharging,
   );
 
-  // Consumo reale: usiamo solo i rifornimenti segnati come "pieno",
-  // evitando di presentare come preciso un dato ricavato da rabbocchi parziali.
-  const fullFuel = [...filteredFuel]
-    .filter((e) => e.fullTank && e.liters > 0)
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  let consumptionSum = 0;
-  let consumptionSamples = 0;
-  for (let i = 1; i < fullFuel.length; i += 1) {
-    const distance = fullFuel[i].km - fullFuel[i - 1].km;
-    if (distance > 0) {
-      consumptionSum += (fullFuel[i].liters / distance) * 100;
-      consumptionSamples += 1;
-    }
-  }
-  const averageConsumption = consumptionSamples > 0 ? consumptionSum / consumptionSamples : null;
-  const totalChargingKwh = filteredCharging.reduce((sum, e) => sum + (Number(e.kWh) || 0), 0);
-  const averageChargingPrice = totalChargingKwh > 0 ? costs.chargingCost / totalChargingKwh : null;
-  const totalRecordedKm = costs.totalKm;
-
   return (
     <section className="vehicle-detail-page">
       <button type="button" className="back-link" onClick={onBack}>
@@ -313,12 +293,6 @@ export default function VehicleDetail({
                 </button>
               </div>
             </div>
-            <MaintenanceOverview
-              entries={maintenanceEntries}
-              reminders={reminders}
-              currentKm={vehicle.currentKm}
-              onOpenReminders={() => setTab("scadenze")}
-            />
             <MaintenanceList entries={maintenanceEntries} onDelete={onDeleteMaintenance} />
           </>
         )}
@@ -465,54 +439,6 @@ export default function VehicleDetail({
                 </div>
               </div>
             </div>
-            <div className="stat-row stat-row--secondary">
-              <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">📏</div>
-                <div>
-                  <span className="stat-chip__label">{t("summary.distance")}</span>
-                  <span className="stat-chip__value">
-                    {totalRecordedKm > 0 ? `${Math.round(totalRecordedKm).toLocaleString(getNumberLocale(i18n.language))} ${distanceUnit}` : "—"}
-                  </span>
-                </div>
-              </div>
-              <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">⛽</div>
-                <div>
-                  <span className="stat-chip__label">{t("summary.consumption")}</span>
-                  <span className="stat-chip__value">
-                    {averageConsumption !== null ? `${averageConsumption.toFixed(1)} L/100 km` : "—"}
-                  </span>
-                </div>
-              </div>
-              <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">⚡</div>
-                <div>
-                  <span className="stat-chip__label">{t("summary.energy")}</span>
-                  <span className="stat-chip__value">
-                    {totalChargingKwh > 0 ? `${totalChargingKwh.toFixed(1)} kWh` : "—"}
-                  </span>
-                </div>
-              </div>
-              <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">€/</div>
-                <div>
-                  <span className="stat-chip__label">{t("summary.averageEnergyPrice")}</span>
-                  <span className="stat-chip__value">
-                    {averageChargingPrice !== null ? formatMoney(averageChargingPrice, 3) + "/kWh" : "—"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="summary-insight">
-              <strong>{t("summary.dataQualityTitle")}</strong>
-              <span>{
-                averageConsumption !== null
-                  ? t("summary.dataQualityConsumption", { count: consumptionSamples })
-                  : t("summary.dataQualityHint")
-              }</span>
-            </div>
-
             <CostChart fuelEntries={filteredFuel} maintenanceEntries={filteredMaintenance} expenseEntries={filteredExpenses} />
           </>
         )}

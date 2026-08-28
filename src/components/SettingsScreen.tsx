@@ -1,16 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { CURRENCIES } from "../utils/settings";
-import type { Theme } from "../utils/theme";
 
 interface Props {
   onClose: () => void;
   onOpenBackup: () => void;
-  theme: Theme;
-  onToggleTheme: () => void;
 }
 
-export default function SettingsScreen({ onClose, onOpenBackup, theme, onToggleTheme }: Props) {
+export default function SettingsScreen({ onClose, onOpenBackup }: Props) {
   const { t } = useTranslation();
   const { currency, setCurrency, distanceUnit, setDistanceUnit, temperatureUnit, setTemperatureUnit } = useAppSettings();
 
@@ -25,13 +22,6 @@ export default function SettingsScreen({ onClose, onOpenBackup, theme, onToggleT
         </div>
 
         <div style={{ padding: "0 1.5rem 1.5rem" }}>
-          <div className="field">
-            <label htmlFor="settings-theme">{t("settingsScreen.theme", "Tema")}</label>
-            <button id="settings-theme" type="button" className="btn btn--ghost" onClick={onToggleTheme}>
-              {theme === "dark" ? t("app.themeToLight", "Passa al tema chiaro") : t("app.themeToDark", "Passa al tema scuro")}
-            </button>
-          </div>
-
           <div className="field">
             <label htmlFor="settings-currency">{t("settingsScreen.currency")}</label>
             <select id="settings-currency" value={currency} onChange={(e) => setCurrency(e.target.value)}>

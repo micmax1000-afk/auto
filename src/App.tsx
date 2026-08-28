@@ -25,10 +25,10 @@ import {
 } from "./utils/storage";
 import { isReminderDue } from "./utils/calculations";
 import { areNotificationsEnabled, notifyDueReminders, type NotifiableReminder } from "./utils/notifications";
+import { applyTheme, getInitialTheme, setStoredTheme, type Theme } from "./utils/theme";
 import { getNumberLocale } from "./utils/locale";
 import { formatDistance } from "./utils/settings";
 import { useAppSettings } from "./contexts/AppSettingsContext";
-import { applyTheme, getInitialTheme, setStoredTheme, type Theme } from "./utils/theme";
 import { isRtlLanguage } from "./i18n";
 import VehicleCard from "./components/VehicleCard";
 import VehicleForm from "./components/VehicleForm";
@@ -56,7 +56,8 @@ type PendingAction =
   | { kind: "quickFuel" }
   | { kind: "quickCharge" };
 
-const MAIN_TAB_TO_DETAIL_TAB: Record<"manutenzione" | "statistiche", DetailTabTarget> = {
+const MAIN_TAB_TO_DETAIL_TAB: Record<"promemoria" | "manutenzione" | "statistiche", DetailTabTarget> = {
+  promemoria: "scadenze",
   manutenzione: "manutenzioni",
   statistiche: "riepilogo",
 };
@@ -85,11 +86,10 @@ export default function App() {
   const [showNewVehicleForm, setShowNewVehicleForm] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
   const [showTireCalc, setShowTireCalc] = useState(false);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
   const { isPro, refresh: refreshProStatus } = useProStatus();
   const { distanceUnit } = useAppSettings();
   const [quickKmVehicle, setQuickKmVehicle] = useState<Vehicle | null>(null);
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
 
   function handleToggleTheme() {
     const next: Theme = theme === "dark" ? "light" : "dark";
@@ -393,28 +393,30 @@ export default function App() {
     return isReminderDue(r.dueDate, r.dueKm, vehicle.currentKm) !== "ok";
   }).length;
 
-  // Navigazione principale mobile: 5 aree, con le funzioni secondarie raccolte in "Altro".
+  // La bottom bar ha 6 sezioni: Garage (Dashboard), Rifornimento e Ricarica
+  // (inserimento rapido diretto), Promemoria/Manutenzione/Statistiche
+  // (non hanno ancora una vista aggregata multi-veicolo, quindi aprono un
+  // veicolo — scelto esplicitamente se più di uno attivo — sulla scheda
+  // corrispondente: comportamento onesto, da evolvere in una vista
+  // aggregata reale quando servirà davvero).
   function handleMainTabChange(tab: TabId) {
-    setShowBackup(false);
-    setShowManageVehicles(false);
-    setShowMoreMenu(tab === "altro");
     if (tab === "garage") {
       setMainTab("garage");
+      setShowBackup(false);
       setOpenVehicleId(null);
       return;
     }
-    if (tab === "movimenti") {
-      setMainTab("movimenti");
-      setOpenVehicleId(null);
+    if (tab === "rifornimento") {
+      requestVehicleAction({ kind: "quickFuel" });
       return;
     }
-    if (tab === "manutenzione" || tab === "statistiche") {
-      setMainTab(tab);
-      requestVehicleAction({ kind: "navigate", tab: MAIN_TAB_TO_DETAIL_TAB[tab] });
+    if (tab === "ricarica") {
+      requestVehicleAction({ kind: "quickCharge" });
       return;
     }
-    setMainTab("altro");
-    setOpenVehicleId(null);
+    setMainTab(tab);
+    setShowBackup(false);
+    requestVehicleAction({ kind: "navigate", tab: MAIN_TAB_TO_DETAIL_TAB[tab] });
   }
 
   function handleBackFromDetail() {
@@ -466,7 +468,24 @@ export default function App() {
               </button>
             )}
             <LanguageSwitcher />
-
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={handleToggleTheme}
+              title={theme === "dark" ? t("app.themeToLight") : t("app.themeToDark")}
+              aria-label={theme === "dark" ? t("app.themeToLight") : t("app.themeToDark")}
+            >
+              {theme === "dark" ? (
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="5" />
+                  <path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" />
+                </svg>
+              )}
+            </button>
             <button
               type="button"
               className="theme-toggle"
@@ -632,38 +651,11 @@ export default function App() {
           </section>
         )}
 
-        {!showBackup && !showManageVehicles && !openVehicle && mainTab === "movimenti" && (
-          <section className="quick-hub">
-            <div className="section-head"><div><h1>{t("bottomNav.movements", "Movimenti")}</h1><p className="section-subtitle">{t("quickEntry.fullFormHint")}</p></div></div>
-            <div className="quick-hub__grid">
-              <button type="button" className="quick-hub__card" onClick={() => requestVehicleAction({ kind: "quickFuel" })}><span className="quick-hub__icon">⛽</span><strong>{t("quickEntry.fuelTitle")}</strong><span>{t("bottomNav.fuel")}</span></button>
-              <button type="button" className="quick-hub__card" onClick={() => requestVehicleAction({ kind: "quickCharge" })}><span className="quick-hub__icon">⚡</span><strong>{t("quickEntry.chargeTitle")}</strong><span>{t("bottomNav.charging")}</span></button>
-              <button type="button" className="quick-hub__card" onClick={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}><span className="quick-hub__icon">🧾</span><strong>{t("summary.expenses")}</strong><span>{t("summary.title")}</span></button>
-            </div>
-          </section>
-        )}
-
-        {!showBackup && !showManageVehicles && !openVehicle && mainTab === "altro" && showMoreMenu && (
-          <section className="quick-hub">
-            <div className="section-head"><div><h1>{t("bottomNav.more", "Altro")}</h1><p className="section-subtitle">{t("settingsScreen.title")}</p></div></div>
-            <div className="quick-hub__menu">
-              <button type="button" className="quick-hub__menu-item" onClick={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}><span>🔔</span><strong>{t("bottomNav.reminders")}</strong></button>
-              <button type="button" className="quick-hub__menu-item" onClick={() => setShowManageVehicles(true)}><span>🚗</span><strong>{t("vehicles.title")}</strong></button>
-              <button type="button" className="quick-hub__menu-item" onClick={() => setShowBackup(true)}><span>☁️</span><strong>{t("nav.backup")}</strong></button>
-              <button type="button" className="quick-hub__menu-item" onClick={() => setShowSettings(true)}><span>⚙️</span><strong>{t("settingsScreen.title")}</strong></button>
-              <button type="button" className="quick-hub__menu-item" onClick={() => setShowTireCalc(true)}><span>🛞</span><strong>{t("tireCalc.title")}</strong></button>
-            </div>
-          </section>
-        )}
-
-        {!showBackup && !showManageVehicles && !openVehicle && mainTab !== "movimenti" && mainTab !== "altro" && (
+        {!showBackup && !showManageVehicles && !openVehicle && (
           <Dashboard
             vehicles={vehicles}
             reminders={reminders}
             maintenanceEntries={maintenanceEntries}
-            fuelEntries={fuelEntries}
-            chargingEntries={chargingEntries}
-            expenseEntries={expenseEntries}
             isPro={isPro}
             onOpenVehicle={(id) => {
               setOpenVehicleId(id);
@@ -671,9 +663,6 @@ export default function App() {
             }}
             onAddVehicle={handleRequestAddVehicle}
             onManageVehicles={() => setShowManageVehicles(true)}
-            onQuickFuel={() => requestVehicleAction({ kind: "quickFuel" })}
-            onQuickCharge={() => requestVehicleAction({ kind: "quickCharge" })}
-            onQuickKm={(vehicle) => setQuickKmVehicle(vehicle)}
           />
         )}
 
@@ -731,7 +720,7 @@ export default function App() {
       )}
 
       {showSettings && (
-        <SettingsScreen onClose={() => setShowSettings(false)} onOpenBackup={() => setShowBackup(true)} theme={theme} onToggleTheme={handleToggleTheme} />
+        <SettingsScreen onClose={() => setShowSettings(false)} onOpenBackup={() => setShowBackup(true)} />
       )}
 
       {showPremium && (
