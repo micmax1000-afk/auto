@@ -228,7 +228,6 @@ export default function VehicleDetail({
     }
   }
   const averageConsumption = consumptionSamples > 0 ? consumptionSum / consumptionSamples : null;
-  const totalFuelLiters = filteredFuel.reduce((sum, e) => sum + (Number(e.liters) || 0), 0);
   const totalChargingKwh = filteredCharging.reduce((sum, e) => sum + (Number(e.kWh) || 0), 0);
   const averageChargingPrice = totalChargingKwh > 0 ? costs.chargingCost / totalChargingKwh : null;
   const totalRecordedKm = costs.totalKm;

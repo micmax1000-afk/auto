@@ -82,7 +82,7 @@ function monthlyCost(fuel: FuelEntry[], charging: ChargingEntry[], maintenance: 
   }, 0);
 }
 
-function urgentTotal(vehicles: Vehicle[], reminders: Reminder[], maintenance: MaintenanceEntry[]) {
+function urgentTotal(vehicles: Vehicle[], reminders: Reminder[]) {
   const ids = new Set(vehicles.map(v => v.id));
   const reminderCount = reminders.filter(r => ids.has(r.vehicleId) && !r.completed).filter(r => {
     const v = vehicles.find(x => x.id === r.vehicleId);
@@ -126,7 +126,7 @@ export default function Dashboard({
         </div>
         <div className="dash-hero__today">
           <span>⚡</span>
-          <strong>{urgentTotal(activeVehicles, reminders, maintenanceEntries)}</strong>
+          <strong>{urgentTotal(activeVehicles, reminders)}</strong>
           <small>{t("dashboardGarage.actionsNeeded", "attenzioni da controllare")}</small>
         </div>
       </section>
@@ -143,7 +143,7 @@ export default function Dashboard({
         <section className="dash-overview-grid">
           <OverviewCard icon="💶" label={t("dashboardGarage.monthCost", "Spese questo mese")} value={formatEuro(monthlyCost(fuelEntries, chargingEntries, maintenanceEntries, expenseEntries))} />
           <OverviewCard icon="🔧" label={t("dashboardGarage.openItems", "Interventi registrati")} value={String(maintenanceEntries.filter(m => activeVehicles.some(v => v.id === m.vehicleId)).length)} />
-          <OverviewCard icon="🔔" label={t("dashboardGarage.urgent", "Scadenze")} value={String(urgentTotal(activeVehicles, reminders, maintenanceEntries))} tone={urgentTotal(activeVehicles, reminders, maintenanceEntries) > 0 ? "warn" : "ok"} />
+          <OverviewCard icon="🔔" label={t("dashboardGarage.urgent", "Scadenze")} value={String(urgentTotal(activeVehicles, reminders))} tone={urgentTotal(activeVehicles, reminders) > 0 ? "warn" : "ok"} />
         </section>
       )}
 
