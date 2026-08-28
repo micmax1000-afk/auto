@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.3.0 — 28 agosto 2026
+
+- “Movimenti” è ora una vista dedicata con rifornimenti, ricariche e spese nello stesso selettore.
+- “Statistiche” apre direttamente il riepilogo, come nella composizione di riferimento.
+- Comandi di aggiunta resi più riconoscibili con azione circolare blu.
+
+## 2.2.2 — 28 agosto 2026
+
+- Sfondo officina mantenuto in tutte le viste, con contrasto calibrato sulle schede.
+- Sezione del veicolo attivo resa più chiara, con comandi espliciti per aprire o gestire il Garage.
+
 ## 2.2.1 — 28 agosto 2026
 
 ### Interfaccia garage
