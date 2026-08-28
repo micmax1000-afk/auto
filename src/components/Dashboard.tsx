@@ -15,6 +15,7 @@ interface Props {
   onOpenVehicle: (id: string) => void;
   onAddVehicle: () => void;
   onManageVehicles: () => void;
+  onShortcut: (destination: "fuel" | "maintenance" | "reminders" | "statistics" | "live" | "backup" | "premium") => void;
 }
 
 function getNextReminder(
@@ -71,6 +72,7 @@ export default function Dashboard({
   onOpenVehicle,
   onAddVehicle,
   onManageVehicles,
+  onShortcut,
 }: Props) {
   const { t, i18n } = useTranslation();
   const { distanceUnit } = useAppSettings();
@@ -103,6 +105,36 @@ export default function Dashboard({
             />
           </picture>
         </div>
+      </section>
+
+      <section className="dash-quick-grid" aria-label="Azioni rapide">
+        <button type="button" className="dash-quick-card dash-quick-card--blue" onClick={() => activeVehicles[0] && onOpenVehicle(activeVehicles[0].id)}>
+          <span className="dash-quick-card__icon" aria-hidden="true">⌁</span><span>Dashboard</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--green" onClick={() => onShortcut("fuel")}>
+          <span className="dash-quick-card__icon" aria-hidden="true">⛽</span><span>Movimenti</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--amber" onClick={() => onShortcut("maintenance")}>
+          <span className="dash-quick-card__icon" aria-hidden="true">🔧</span><span>Manutenzione</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--violet" onClick={() => onShortcut("reminders")}>
+          <span className="dash-quick-card__icon" aria-hidden="true">▣</span><span>Scadenze</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--orange" onClick={() => onShortcut("statistics")}>
+          <span className="dash-quick-card__icon" aria-hidden="true">◔</span><span>Statistiche</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--red" onClick={() => onShortcut("live")}>
+          <span className="dash-quick-card__icon" aria-hidden="true">▱</span><span>OBD</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--blue" onClick={() => onShortcut("backup")}>
+          <span className="dash-quick-card__icon" aria-hidden="true">▰</span><span>Documenti</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--cyan" onClick={onManageVehicles}>
+          <span className="dash-quick-card__icon" aria-hidden="true">⌘</span><span>Veicoli</span>
+        </button>
+        <button type="button" className="dash-quick-card dash-quick-card--gold" onClick={() => onShortcut("premium")}>
+          <span className="dash-quick-card__icon" aria-hidden="true">♛</span><span>Premium</span>
+        </button>
       </section>
 
       {/* VEICOLI */}

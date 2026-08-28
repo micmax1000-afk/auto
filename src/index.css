@@ -2783,3 +2783,66 @@ textarea {
   font-size: 0.7rem;
   color: var(--paper-dim, #8a93a1);
 }
+
+/* =====================================================
+   V8.2 — interfaccia garage mobile
+   ===================================================== */
+.app {
+  background: #050a0f;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(99, 160, 210, 0.18);
+  background: rgba(3, 9, 14, 0.94);
+  backdrop-filter: blur(16px);
+}
+
+.topbar__inner { max-width: 620px; }
+.topbar__title { font-family: Inter, system-ui, sans-serif; font-size: 1.25rem; font-weight: 800; letter-spacing: 0.025em; }
+.topbar__subtitle, .topbar__pro-btn, .language-switcher, .topbar .theme-toggle:not(:last-child) { display: none; }
+.topbar__actions { margin-left: auto; }
+
+.content:has(.dashboard) {
+  padding: 0 0 6.2rem;
+  background:
+    linear-gradient(180deg, rgba(3, 9, 14, 0.28) 0%, rgba(3, 9, 14, 0.76) 53%, #050a0f 100%),
+    url("/images/garage-hero.jpg") center top / cover fixed;
+}
+
+.dashboard { max-width: 620px; min-height: calc(100vh - 62px); margin: 0 auto; padding: 0 1.25rem 6.6rem; background: transparent; }
+.dash-hero { min-height: 262px; margin: 0 -1.25rem 0.4rem; border: 0; border-radius: 0; background: transparent; }
+.dash-hero__image-wrap { display: none; }
+.dash-hero__content { max-width: 100%; padding: 1.5rem 1.25rem; align-self: flex-start; }
+.dash-hero__label { display: none; }
+.dash-hero__title { font-family: Inter, system-ui, sans-serif; font-size: 1.6rem; line-height: 1.22; text-shadow: 0 2px 18px #000; }
+.dash-hero__title br { display: none; }
+.dash-hero__title::after { content: ""; display: inline-block; width: 12px; height: 12px; margin-left: 0.45rem; border-radius: 50%; background: #58dc79; box-shadow: 0 0 13px #58dc79; }
+.dash-hero__subtitle { font-family: Inter, system-ui, sans-serif; color: #e6eef6; font-weight: 600; text-shadow: 0 2px 14px #000; }
+
+.dash-quick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; position: relative; z-index: 2; }
+.dash-quick-card { min-height: 104px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.58rem; padding: 0.65rem 0.35rem; color: #f7fbff; border: 1px solid rgba(123, 169, 205, 0.24); border-radius: 13px; background: linear-gradient(145deg, rgba(17, 31, 43, 0.94), rgba(5, 13, 20, 0.92)); box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 8px 18px rgba(0,0,0,.24); font: 600 0.82rem/1.1 Inter, system-ui, sans-serif; cursor: pointer; }
+.dash-quick-card:active { transform: scale(.97); }
+.dash-quick-card__icon { font-family: system-ui, sans-serif; font-size: 2rem; font-weight: 700; line-height: 1; filter: drop-shadow(0 0 9px currentColor); }
+.dash-quick-card--blue { color: #399cff; }.dash-quick-card--green { color: #59dc7a; }.dash-quick-card--amber { color: #ffc331; }.dash-quick-card--violet { color: #aa76ff; }.dash-quick-card--orange { color: #ff9d30; }.dash-quick-card--red { color: #ff5f5f; }.dash-quick-card--cyan { color: #4fe1df; }.dash-quick-card--gold { color: #ffd145; }
+.dash-quick-card span:last-child { color: #f5f8fa; filter: none; }
+
+.dash-vehicles { padding: 1.25rem 0 0; }.dash-vehicles__head { display: none; }.dash-vehicle-list { display: block; }.dash-card { display: flex; min-height: 64px; border-radius: 10px; border-color: rgba(123, 169, 205, 0.32); background: rgba(4, 12, 19, 0.88); }.dash-card:not(:first-child) { display: none; }.dash-card__photo { width: 60px; flex: 0 0 60px; }.dash-card__body { padding: 0.55rem 0.7rem; }.dash-card__name { font-size: 0.95rem; }.dash-card__stats, .dash-card__reminder { display: none; }.dash-card__km { font-size: .82rem; }
+
+.bottom-tabbar { z-index: 50; left: 50%; width: min(620px, 100%); transform: translateX(-50%); border: 1px solid rgba(109, 161, 198, .22); border-bottom: 0; border-radius: 17px 17px 0 0; background: rgba(3, 11, 18, .96); backdrop-filter: blur(18px); padding: .6rem .85rem max(.65rem, env(safe-area-inset-bottom)); }
+.bottom-tabbar__item { min-width: 0; color: #cbd7e1; }.bottom-tabbar__item.is-active { color: #3298ff; }.bottom-tabbar__item svg { width: 25px; height: 25px; }
+
+@media (min-width: 680px) {
+  .app { max-width: 620px; margin: 0 auto; min-height: 100vh; box-shadow: 0 0 60px rgba(0,0,0,.52); }
+}
+
+.content:has(.vehicle-detail-page) { padding: 1rem 1.05rem 6.7rem; background: linear-gradient(rgba(3,9,14,.94), rgba(3,9,14,.98)), url("/images/garage-hero.jpg") center / cover fixed; }
+.vehicle-detail-page { max-width: 620px; margin: 0 auto; }
+.vehicle-detail-page > .section-head { justify-content: center; margin: .2rem 0 1rem; }.vehicle-detail-page > .section-head h1 { font: 800 1.2rem Inter, system-ui, sans-serif; text-transform: uppercase; letter-spacing: .04em; }.detail-km { display: none; }
+.back-link { position: absolute; z-index: 2; margin-top: .18rem; width: 36px; height: 36px; overflow: hidden; font-size: 0; border: 0; border-radius: 9px; color: #f3f7fb; background: rgba(10,22,32,.82); }.back-link::after { content: "☰"; font: 1.35rem/36px system-ui; }
+.subtabbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; overflow: hidden; margin: 0 0 1rem; padding: 0; border: 1px solid rgba(119,166,201,.22); border-radius: 10px; background: rgba(7,18,28,.9); }.subtabbar__item { min-width: 0; padding: .7rem .35rem; border-bottom: 1px solid transparent; font: 600 .7rem/1.1 Inter, system-ui, sans-serif; text-transform: none; color: #e7eff6; }.subtabbar__item.is-active { color: #39a0ff; border-bottom-color: #3298ff; background: linear-gradient(180deg, rgba(39,141,244,.24), rgba(16,72,126,.22)); }
+.vehicle-detail-page .section-head--tight { margin: .6rem 0 .85rem; }.vehicle-detail-page .section-head--tight h2 { font: 700 1rem Inter, system-ui, sans-serif; }
+.record-card, .stat-chip, .chart-wrap, .month-group { border-color: rgba(118,166,199,.25); background: linear-gradient(145deg, rgba(15,32,45,.92), rgba(6,16,25,.94)); box-shadow: inset 0 1px rgba(255,255,255,.025); }.record-card { border-radius: 12px; }.stat-chip { border-radius: 11px; }.period-filter { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid rgba(118,166,199,.25); border-radius: 10px; overflow: hidden; }.period-filter__btn { border: 0; border-radius: 0; font: 600 .78rem Inter, system-ui, sans-serif; }.period-filter__btn.is-active { background: linear-gradient(135deg, #2d9dff, #1661cb); }

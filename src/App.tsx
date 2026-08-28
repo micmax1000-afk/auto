@@ -663,6 +663,15 @@ export default function App() {
             }}
             onAddVehicle={handleRequestAddVehicle}
             onManageVehicles={() => setShowManageVehicles(true)}
+            onShortcut={(destination) => {
+              if (destination === "fuel") handleMainTabChange("rifornimento");
+              if (destination === "maintenance") handleMainTabChange("manutenzione");
+              if (destination === "reminders") handleMainTabChange("promemoria");
+              if (destination === "statistics") handleMainTabChange("statistiche");
+              if (destination === "live") requestVehicleAction({ kind: "navigate", tab: "live" });
+              if (destination === "backup") setShowBackup(true);
+              if (destination === "premium") setShowPremium(true);
+            }}
           />
         )}
 
