@@ -1,14 +1,13 @@
 {
-  "name": "auto",
+  "name": "diario-auto",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy"
+    "preview": "vite preview"
   },
   "dependencies": {
     "i18next": "^26.4.0",
