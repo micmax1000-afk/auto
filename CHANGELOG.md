@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.1 — 28 agosto 2026
+
+- Corretto errore TypeScript nella vista Movimenti, segnalato dalla build Cloudflare.
+
 ## 2.3.0 — 28 agosto 2026
 
 - “Movimenti” è ora una vista dedicata con rifornimenti, ricariche e spese nello stesso selettore.
