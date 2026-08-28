@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Vehicle, FuelEntry, ChargingEntry, MaintenanceEntry, ExpenseEntry, Reminder } from "../types";
-import { calculateVehicleCosts, isReminderDue } from "../utils/calculations";
+import { calculateVehicleCosts } from "../utils/calculations";
 import { getNumberLocale } from "../utils/locale";
 import { formatDistance } from "../utils/settings";
 import { useAppSettings } from "../contexts/AppSettingsContext";
@@ -181,8 +181,6 @@ export default function VehicleDetail({
     }
   }
 
-  const activeRemindersCount = reminders.filter((r) => !r.completed && isReminderDue(r.dueDate, r.dueKm, vehicle.currentKm) !== "ok").length;
-
   const currentYear = new Date().getFullYear();
   const availableYears = Array.from(
     new Set(
@@ -238,9 +236,6 @@ export default function VehicleDetail({
             onClick={() => setTab(tabId)}
           >
             {t(TAB_I18N_KEYS[tabId])}
-            {tabId === "scadenze" && activeRemindersCount > 0 && (
-              <span className="subtabbar__badge">{activeRemindersCount}</span>
-            )}
           </button>
         ))}
       </nav>}
