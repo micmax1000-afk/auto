@@ -216,6 +216,16 @@ export default function Dashboard({
                       </div>
                     )}
                   </div>
+                  <button
+                    type="button"
+                    className="dash-card__switch"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onManageVehicles();
+                    }}
+                  >
+                    {t("dashboardGarage.manage")}
+                  </button>
                 </article>
               );
             })}

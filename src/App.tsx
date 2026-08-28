@@ -407,7 +407,7 @@ export default function App() {
       return;
     }
     if (tab === "rifornimento") {
-      requestVehicleAction({ kind: "quickFuel" });
+      requestVehicleAction({ kind: "navigate", tab: "rifornimenti" });
       return;
     }
     if (tab === "ricarica") {

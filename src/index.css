@@ -2846,3 +2846,63 @@ textarea {
 .subtabbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; overflow: hidden; margin: 0 0 1rem; padding: 0; border: 1px solid rgba(119,166,201,.22); border-radius: 10px; background: rgba(7,18,28,.9); }.subtabbar__item { min-width: 0; padding: .7rem .35rem; border-bottom: 1px solid transparent; font: 600 .7rem/1.1 Inter, system-ui, sans-serif; text-transform: none; color: #e7eff6; }.subtabbar__item.is-active { color: #39a0ff; border-bottom-color: #3298ff; background: linear-gradient(180deg, rgba(39,141,244,.24), rgba(16,72,126,.22)); }
 .vehicle-detail-page .section-head--tight { margin: .6rem 0 .85rem; }.vehicle-detail-page .section-head--tight h2 { font: 700 1rem Inter, system-ui, sans-serif; }
 .record-card, .stat-chip, .chart-wrap, .month-group { border-color: rgba(118,166,199,.25); background: linear-gradient(145deg, rgba(15,32,45,.92), rgba(6,16,25,.94)); box-shadow: inset 0 1px rgba(255,255,255,.025); }.record-card { border-radius: 12px; }.stat-chip { border-radius: 11px; }.period-filter { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid rgba(118,166,199,.25); border-radius: 10px; overflow: hidden; }.period-filter__btn { border: 0; border-radius: 0; font: 600 .78rem Inter, system-ui, sans-serif; }.period-filter__btn.is-active { background: linear-gradient(135deg, #2d9dff, #1661cb); }
+
+/* Sfondo officina persistente: le superfici restano opache per conservare contrasto e leggibilita. */
+.content {
+  background:
+    linear-gradient(180deg, rgba(3, 9, 14, 0.89), rgba(3, 9, 14, 0.96)),
+    url("/images/garage-hero.jpg") center / cover fixed;
+}
+
+.dash-vehicles__head {
+  display: flex;
+  margin: 0 0 .55rem;
+  padding: 0 .15rem;
+}
+
+.dash-vehicles__head h2 {
+  font: 700 .86rem Inter, system-ui, sans-serif;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #b9c8d5;
+}
+
+.dash-vehicles__head .dash-link:first-child {
+  padding: .4rem .7rem;
+  border: 1px solid rgba(105, 164, 208, .42);
+  border-radius: 8px;
+  color: #f3f8fc;
+  background: rgba(9, 26, 39, .86);
+}
+
+.dash-vehicles__head .dash-link:not(:first-child) { display: none; }
+
+.dash-card { align-items: center; }
+.dash-card__body { flex: 1; min-width: 0; }
+.dash-card__switch {
+  flex: none;
+  margin-right: .55rem;
+  padding: .48rem .65rem;
+  border: 1px solid rgba(105, 164, 208, .5);
+  border-radius: 8px;
+  color: #f4f8fb;
+  background: rgba(18, 40, 57, .9);
+  font: 700 .68rem Inter, system-ui, sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.subtabbar--movements { grid-template-columns: repeat(3, 1fr); }
+.vehicle-detail-page .section-head--tight > .btn--primary {
+  min-width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0;
+  background: linear-gradient(135deg, #3babff, #1767d9);
+  box-shadow: 0 7px 16px rgba(28, 130, 240, .35);
+}
+.vehicle-detail-page .section-head--tight > .btn--primary::after { content: "+"; font: 300 2rem/38px Inter, system-ui, sans-serif; }
+.vehicle-detail-page .stat-row { grid-template-columns: repeat(3, 1fr); gap: .55rem; }
+.vehicle-detail-page .stat-chip { min-height: 88px; justify-content: center; }
+.vehicle-detail-page .stat-chip__value { font-size: 1.05rem; }

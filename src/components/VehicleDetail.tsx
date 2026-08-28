@@ -211,6 +211,11 @@ export default function VehicleDetail({
     filteredExpenses,
     filteredCharging,
   );
+  const isMovementsView = tab === "rifornimenti" || tab === "ricarica" || tab === "spese";
+  const viewTitle = isMovementsView ? "Movimenti" : tab === "riepilogo" ? "Statistiche" : vehicle.name;
+  const visibleTabs = isMovementsView
+    ? TAB_IDS.filter((tabId) => tabId === "rifornimenti" || tabId === "ricarica" || tabId === "spese")
+    : [];
 
   return (
     <section className="vehicle-detail-page">
@@ -220,12 +225,12 @@ export default function VehicleDetail({
       </button>
 
       <div className="section-head">
-        <h1>{vehicle.name}</h1>
+        <h1>{viewTitle}</h1>
         <span className="detail-km">{formatDistance(vehicle.currentKm, distanceUnit, getNumberLocale(i18n.language))}</span>
       </div>
 
-      <nav className="subtabbar">
-        {TAB_IDS.map((tabId) => (
+      {visibleTabs.length > 0 && <nav className="subtabbar subtabbar--movements">
+        {visibleTabs.map((tabId) => (
           <button
             key={tabId}
             type="button"
@@ -238,7 +243,7 @@ export default function VehicleDetail({
             )}
           </button>
         ))}
-      </nav>
+      </nav>}
 
       <div className="detail-content" key={tab}>
         {tab === "live" && (
