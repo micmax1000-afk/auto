@@ -121,6 +121,10 @@
     "summaryTotalCost": "Spesa totale",
     "summaryAvgConsumption": "Consumo medio",
     "summaryTotalDistance": "Distanza totale",
+    "periodLast3": "Ultimi 3 mesi",
+    "periodLast6": "Ultimi 6 mesi",
+    "periodLast12": "Ultimi 12 mesi",
+    "periodAll": "Sempre",
     "fillupsCount": "{{count}} rifornimenti",
     "pricePerUnitLabel": "€/{{unit}}"
   },
@@ -752,6 +756,13 @@
     "newAvgConsumption": "Nuovo consumo medio",
     "saveFuel": "Salva rifornimento",
     "saveCharge": "Salva ricarica"
+  },
+  "kmHistory": {
+    "title": "Cronologia km",
+    "trend": "Andamento percorrenza",
+    "notEnoughData": "Servono almeno due letture per mostrare il grafico.",
+    "addReading": "Aggiungi lettura contachilometri",
+    "hint": "Le letture qui sopra provengono dai rifornimenti e dalle ricariche registrate. Una lettura manuale aggiorna il chilometraggio attuale del veicolo."
   },
   "dashCluster": {
     "title": "Cruscotto scadenze",

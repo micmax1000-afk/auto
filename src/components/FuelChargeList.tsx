@@ -8,6 +8,7 @@ import { kmToDisplayDistance } from "../utils/settings";
 import CategoryIcon from "./CategoryIcon";
 
 type Filter = "all" | "fuel" | "electric";
+type Period = "all" | "12m" | "6m" | "3m";
 
 type Row =
   | { kind: "fuel"; entry: FuelEntry }
@@ -34,6 +35,7 @@ export default function FuelChargeList({
   const { formatMoney, distanceUnit } = useAppSettings();
   const locale = getNumberLocale(i18n.language);
   const [filter, setFilter] = useState<Filter>("all");
+  const [period, setPeriod] = useState<Period>("12m");
 
   const rows: Row[] = [
     ...fuelEntries.map((entry): Row => ({ kind: "fuel", entry })),
@@ -54,6 +56,12 @@ export default function FuelChargeList({
     if (filter === "fuel") return r.kind === "fuel";
     return r.kind === "charge";
   });
+
+  const periodMonths = period === "12m" ? 12 : period === "6m" ? 6 : period === "3m" ? 3 : null;
+  const periodCutoff = periodMonths ? new Date(new Date().setMonth(new Date().getMonth() - periodMonths)) : null;
+  const periodFilteredRows = periodCutoff
+    ? filteredRows.filter((r) => new Date(r.entry.date) >= periodCutoff)
+    : filteredRows;
 
   const totalCost = rows.reduce((sum, r) => sum + r.entry.totalCost, 0);
   const consumptionPoints = calculateConsumption(fuelEntries);
@@ -84,6 +92,15 @@ export default function FuelChargeList({
         ))}
       </div>
 
+      <div className="fc-list__period">
+        <select value={period} onChange={(e) => setPeriod(e.target.value as Period)}>
+          <option value="3m">{t("fuel.periodLast3", "Ultimi 3 mesi")}</option>
+          <option value="6m">{t("fuel.periodLast6", "Ultimi 6 mesi")}</option>
+          <option value="12m">{t("fuel.periodLast12", "Ultimi 12 mesi")}</option>
+          <option value="all">{t("fuel.periodAll", "Sempre")}</option>
+        </select>
+      </div>
+
       <div className="fc-list__summary">
         <div className="fc-list__summary-item">
           <span>{t("fuel.summaryTotalCost", "Spesa totale")}</span>
@@ -100,7 +117,7 @@ export default function FuelChargeList({
       </div>
 
       <div className="fc-list__items">
-        {filteredRows.map((row) => {
+        {periodFilteredRows.map((row) => {
           const { entry } = row;
           const isFuel = row.kind === "fuel";
           const unit = isFuel ? "L" : "kWh";

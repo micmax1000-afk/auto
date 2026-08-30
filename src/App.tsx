@@ -45,6 +45,7 @@ import Onboarding from "./components/Onboarding";
 import { getMeta, setMeta } from "./utils/db";
 import QuickFuelForm from "./components/QuickFuelForm";
 import QuickChargeForm from "./components/QuickChargeForm";
+import KmHistory from "./components/KmHistory";
 import { useProStatus, FREE_VEHICLE_LIMIT } from "./services/billing/useProStatus";
 
 // Mappa il tab della bottom bar alla scheda di dettaglio veicolo da aprire
@@ -88,6 +89,7 @@ export default function App() {
   const { isPro, refresh: refreshProStatus } = useProStatus();
   const { distanceUnit } = useAppSettings();
   const [quickKmVehicle, setQuickKmVehicle] = useState<Vehicle | null>(null);
+  const [kmHistoryVehicleId, setKmHistoryVehicleId] = useState<string | null>(null);
 
   function handleToggleTheme() {
     const next: Theme = theme === "dark" ? "light" : "dark";
@@ -626,6 +628,10 @@ export default function App() {
             onOpenStats={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
             onOpenDocuments={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
             onOpenPremium={() => setShowPremium(true)}
+            onOpenKmHistory={() => {
+              const target = vehicles.find((v) => !v.archived);
+              if (target) setKmHistoryVehicleId(target.id);
+            }}
           />
         )}
 
@@ -710,6 +716,24 @@ export default function App() {
           onClose={() => setPendingVehicleAction(null)}
         />
       )}
+
+      {kmHistoryVehicleId &&
+        (() => {
+          const v = vehicles.find((veh) => veh.id === kmHistoryVehicleId);
+          if (!v) return null;
+          return (
+            <KmHistory
+              vehicle={v}
+              fuelEntries={fuelEntries.filter((f) => f.vehicleId === v.id)}
+              chargingEntries={chargingEntries.filter((c) => c.vehicleId === v.id)}
+              onBack={() => setKmHistoryVehicleId(null)}
+              onUpdateKm={() => {
+                setKmHistoryVehicleId(null);
+                setQuickKmVehicle(v);
+              }}
+            />
+          );
+        })()}
 
       {quickFuelVehicleId &&
         (() => {

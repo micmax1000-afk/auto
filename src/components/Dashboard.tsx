@@ -32,6 +32,7 @@ interface Props {
   onOpenStats: () => void;
   onOpenDocuments: () => void;
   onOpenPremium: () => void;
+  onOpenKmHistory: () => void;
 }
 
 function getNextReminder(
@@ -107,6 +108,7 @@ export default function Dashboard({
   onOpenStats,
   onOpenDocuments,
   onOpenPremium,
+  onOpenKmHistory,
 }: Props) {
   const { t, i18n } = useTranslation();
   const { distanceUnit } = useAppSettings();
@@ -138,22 +140,25 @@ export default function Dashboard({
       {primaryVehicle && (
         <section className="dash-featured-vehicle" onClick={() => onOpenVehicle(primaryVehicle.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onOpenVehicle(primaryVehicle.id)}>
           <div className="dash-featured-vehicle__photo">
+            <span className="dash-featured-vehicle__badge">{t("dashboardGarage.primary", "PRINCIPALE")}</span>
             <VehicleBodyIcon bodyType={primaryVehicle.bodyType ?? "hatchback"} />
           </div>
           <div className="dash-featured-vehicle__info">
-            <span className="dash-featured-vehicle__badge">{t("dashboardGarage.primary", "PRINCIPALE")}</span>
-            <h1 className="dash-featured-vehicle__name">{primaryVehicle.name}</h1>
-            <p className="dash-featured-vehicle__km">
-              {formatDistance(primaryVehicle.currentKm, distanceUnit, locale)}
-              <button
-                type="button"
-                className="dash-featured-vehicle__edit"
-                onClick={(e) => { e.stopPropagation(); onQuickKm(primaryVehicle); }}
-                aria-label={t("dashboardGarage.updateKm", "Aggiorna km")}
-              >
-                ✎
-              </button>
-            </p>
+            <div>
+              <h1 className="dash-featured-vehicle__name">{primaryVehicle.name}</h1>
+              <p className="dash-featured-vehicle__km">
+                {formatDistance(primaryVehicle.currentKm, distanceUnit, locale)}
+                <button
+                  type="button"
+                  className="dash-featured-vehicle__edit"
+                  onClick={(e) => { e.stopPropagation(); onQuickKm(primaryVehicle); }}
+                  aria-label={t("dashboardGarage.updateKm", "Aggiorna km")}
+                >
+                  ✎
+                </button>
+              </p>
+            </div>
+            <span className="dash-featured-vehicle__chevron">›</span>
           </div>
         </section>
       )}
@@ -162,7 +167,7 @@ export default function Dashboard({
         <section className="dash-gauge-card">
           <div className="dash-gauge-card__head">
             <h2>{t("dashboardGarage.cluster", "Cruscotto")}</h2>
-            <button type="button" className="dash-icon-btn" onClick={onOpenStats} aria-label={t("bottomNav.stats", "Statistiche")}>
+            <button type="button" className="dash-icon-btn" onClick={onOpenKmHistory} aria-label={t("kmHistory.title", "Cronologia km")}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M4 20 10 12 14 15 20 6" />
                 <path d="M14 6h6v6" />
