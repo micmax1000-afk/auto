@@ -36,7 +36,6 @@ import VehicleDetail from "./components/VehicleDetail";
 import QuickKmUpdate from "./components/QuickKmUpdate";
 import BackupPanel from "./components/BackupPanel";
 import SettingsScreen from "./components/SettingsScreen";
-import LanguageSwitcher from "./components/LanguageSwitcher";
 import Dashboard from "./components/Dashboard";
 import BottomTabBar, { type TabId } from "./components/BottomTabBar";
 import PremiumScreen from "./components/PremiumScreen";
@@ -457,51 +456,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
-        <div className="topbar__inner">
-          <div className="topbar__brand">
-            <span className="topbar__title">{t("app.title")}</span>
-            <span className="topbar__subtitle">{t("app.subtitle")}</span>
-          </div>
-          <div className="topbar__actions">
-            {!isPro && (
-              <button type="button" className="topbar__pro-btn" onClick={() => setShowPremium(true)}>
-                {t("premium.topbarCta")}
-              </button>
-            )}
-            <LanguageSwitcher />
-
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={() => {
-                setShowSettings(true);
-                setOpenVehicleId(null);
-              }}
-              title={t("settingsScreen.title")}
-              aria-label={t("settingsScreen.title")}
-            >
-              <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={() => setShowTireCalc(true)}
-              title={t("tireCalc.title")}
-              aria-label={t("tireCalc.title")}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <circle cx="12" cy="12" r="8" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
-
       {!showBackup && !openVehicle && vehicles.filter((v) => !v.archived).length > 1 && (
         <div className="vehicle-switcher">
           {vehicles
@@ -671,6 +625,7 @@ export default function App() {
             onOpenMaintenance={() => requestVehicleAction({ kind: "navigate", tab: "manutenzioni" })}
             onOpenStats={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
             onOpenDocuments={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
+            onOpenPremium={() => setShowPremium(true)}
           />
         )}
 
@@ -728,7 +683,13 @@ export default function App() {
       )}
 
       {showSettings && (
-        <SettingsScreen onClose={() => setShowSettings(false)} onOpenBackup={() => setShowBackup(true)} theme={theme} onToggleTheme={handleToggleTheme} />
+        <SettingsScreen
+          onClose={() => setShowSettings(false)}
+          onOpenBackup={() => setShowBackup(true)}
+          onOpenTireCalc={() => setShowTireCalc(true)}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+        />
       )}
 
       {showPremium && (

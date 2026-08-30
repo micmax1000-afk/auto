@@ -31,6 +31,7 @@ interface Props {
   onOpenMaintenance: () => void;
   onOpenStats: () => void;
   onOpenDocuments: () => void;
+  onOpenPremium: () => void;
 }
 
 function getNextReminder(
@@ -105,6 +106,7 @@ export default function Dashboard({
   onOpenMaintenance,
   onOpenStats,
   onOpenDocuments,
+  onOpenPremium,
 }: Props) {
   const { t, i18n } = useTranslation();
   const { distanceUnit } = useAppSettings();
@@ -125,6 +127,13 @@ export default function Dashboard({
         onOpenMenu={onOpenMenu}
         onOpenNotifications={onOpenReminders}
       />
+
+      {!isPro && (
+        <button type="button" className="dash-pro-banner" onClick={onOpenPremium}>
+          <span>⭐ {t("premium.topbarCta", "Passa a Pro")}</span>
+          <span className="dash-pro-banner__chevron">›</span>
+        </button>
+      )}
 
       {primaryVehicle && (
         <section className="dash-featured-vehicle" onClick={() => onOpenVehicle(primaryVehicle.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onOpenVehicle(primaryVehicle.id)}>
@@ -246,7 +255,9 @@ export default function Dashboard({
           </div>
         ) : (
           <div className="dash-vehicle-list">
-            {activeVehicles.map((v) => {
+            {activeVehicles
+              .filter((v) => v.id !== primaryVehicle?.id)
+              .map((v) => {
               const nextRem = getNextReminder(v.id, v.currentKm, reminders, locale, t, distanceUnit);
               const maint = getMaintenanceStatus(v.id, maintenanceEntries, t);
 

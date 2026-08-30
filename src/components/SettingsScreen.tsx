@@ -10,6 +10,7 @@ import QuickEntryHeader from "./QuickEntryHeader";
 interface Props {
   onClose: () => void;
   onOpenBackup: () => void;
+  onOpenTireCalc: () => void;
   theme: Theme;
   onToggleTheme: () => void;
 }
@@ -20,11 +21,12 @@ const ROW_ICONS: Record<string, string> = {
   language: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 0c2.5 2.7 4 6.2 4 10s-1.5 7.3-4 10m0-20c-2.5 2.7-4 6.2-4 10s1.5 7.3 4 10M2.5 9h19M2.5 15h19",
   units: "M4 7h16M4 12h16M4 17h10",
   theme: "M12 3a9 9 0 1 0 9 9c0-.5-.05-1-.14-1.45A5.5 5.5 0 0 1 12 3z",
+  tire: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 3.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm5.5 5.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8-1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm2.5 4.5a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM12 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4z",
   backup: "M12 4a5 5 0 0 0-4.9 4.02A4 4 0 0 0 6 16h11a4 4 0 0 0 1-7.87A5 5 0 0 0 12 4z",
   info: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 6v.01M11 11h1.5v6H11",
 };
 
-export default function SettingsScreen({ onClose, onOpenBackup, theme, onToggleTheme }: Props) {
+export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, theme, onToggleTheme }: Props) {
   const { t, i18n } = useTranslation();
   const { currency, setCurrency, distanceUnit, setDistanceUnit, temperatureUnit, setTemperatureUnit } = useAppSettings();
   const [openRow, setOpenRow] = useState<RowId>(null);
@@ -96,6 +98,13 @@ export default function SettingsScreen({ onClose, onOpenBackup, theme, onToggleT
             </div>
           </div>
         )}
+
+        {/* Misura ruote */}
+        <div className="settings-row" onClick={onOpenTireCalc} role="button" tabIndex={0}>
+          <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.tire} /></svg></span>
+          <span className="settings-row__label">{t("settingsScreen.tireSize")}</span>
+          <span className="settings-row__chevron">›</span>
+        </div>
 
         {/* Tema */}
         <div className="settings-row" onClick={() => toggleRow("theme")} role="button" tabIndex={0}>
