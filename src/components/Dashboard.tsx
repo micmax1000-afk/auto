@@ -1,11 +1,15 @@
 import { useTranslation } from "react-i18next";
 import type { Vehicle, Reminder, MaintenanceEntry, FuelEntry, ChargingEntry, ExpenseEntry } from "../types";
-import { isReminderDue } from "../utils/calculations";
+import { isReminderDue, calculateConsumption, averageConsumption } from "../utils/calculations";
 import { getNumberLocale } from "../utils/locale";
 import { formatDistance, kmToDisplayDistance, type DistanceUnit } from "../utils/settings";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { FREE_VEHICLE_LIMIT } from "../services/billing/useProStatus";
 import VehicleDashboardCluster from "./VehicleDashboardCluster";
+import VehicleBodyIcon from "./VehicleBodyIcon";
+import VehicleGaugeCluster from "./VehicleGaugeCluster";
+import TopAppBar from "./TopAppBar";
+import UpcomingReminders from "./UpcomingReminders";
 
 interface Props {
   vehicles: Vehicle[];
@@ -21,6 +25,12 @@ interface Props {
   onQuickFuel: () => void;
   onQuickCharge: () => void;
   onQuickKm: (vehicle: Vehicle) => void;
+  onOpenMenu: () => void;
+  onOpenReminder: (vehicleId: string) => void;
+  onOpenReminders: () => void;
+  onOpenMaintenance: () => void;
+  onOpenStats: () => void;
+  onOpenDocuments: () => void;
 }
 
 function getNextReminder(
@@ -69,19 +79,6 @@ function getMaintenanceStatus(
   return { label: t("dashboardGarage.maintenanceOk"), ok: true };
 }
 
-function formatEuro(value: number) {
-  return value.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-}
-
-function monthlyCost(fuel: FuelEntry[], charging: ChargingEntry[], maintenance: MaintenanceEntry[], expenses: ExpenseEntry[]) {
-  const now = new Date();
-  const sameMonth = (date: string) => { const d = new Date(date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); };
-  return [...fuel, ...charging, ...maintenance, ...expenses].reduce((sum, e) => {
-    const cost = "totalCost" in e ? e.totalCost : "cost" in e ? e.cost : e.amount;
-    return sameMonth(e.date) ? sum + (Number(cost) || 0) : sum;
-  }, 0);
-}
-
 function urgentTotal(vehicles: Vehicle[], reminders: Reminder[]) {
   const ids = new Set(vehicles.map(v => v.id));
   const reminderCount = reminders.filter(r => ids.has(r.vehicleId) && !r.completed).filter(r => {
@@ -91,59 +88,128 @@ function urgentTotal(vehicles: Vehicle[], reminders: Reminder[]) {
   return reminderCount;
 }
 
-function OverviewCard({ icon, label, value, tone }: { icon: string; label: string; value: string; tone?: "warn" | "ok" }) {
-  return <article className={`dash-overview-card ${tone ? `dash-overview-card--${tone}` : ""}`}><span>{icon}</span><div><small>{label}</small><strong>{value}</strong></div></article>;
-}
-
 export default function Dashboard({
   vehicles,
   reminders,
   maintenanceEntries,
   fuelEntries,
-  chargingEntries,
-  expenseEntries,
   isPro,
   onOpenVehicle,
   onAddVehicle,
   onManageVehicles,
   onQuickFuel,
-  onQuickCharge,
   onQuickKm,
+  onOpenMenu,
+  onOpenReminder,
+  onOpenReminders,
+  onOpenMaintenance,
+  onOpenStats,
+  onOpenDocuments,
 }: Props) {
   const { t, i18n } = useTranslation();
   const { distanceUnit } = useAppSettings();
   const locale = getNumberLocale(i18n.language);
   const activeVehicles = vehicles.filter((v) => !v.archived);
+  const primaryVehicle = activeVehicles[0];
+  const urgentCount = urgentTotal(activeVehicles, reminders);
+
+  const primaryConsumption = primaryVehicle
+    ? averageConsumption(calculateConsumption(fuelEntries.filter((f) => f.vehicleId === primaryVehicle.id)))
+    : null;
 
   return (
     <div className="dashboard">
-      {/* HERO / TODAY */}
-      <section className="dash-hero dash-hero--compact">
-        <div className="dash-hero__content">
-          <p className="dash-hero__label">GARAGE AUTO</p>
-          <h1 className="dash-hero__title">Il tuo garage<br />sempre sotto controllo</h1>
-          <p className="dash-hero__subtitle">Manutenzione, rifornimenti e scadenze in un unico posto.</p>
-        </div>
-        <div className="dash-hero__today">
-          <span>⚡</span>
-          <strong>{urgentTotal(activeVehicles, reminders)}</strong>
-          <small>{t("dashboardGarage.actionsNeeded", "attenzioni da controllare")}</small>
-        </div>
-      </section>
+      <TopAppBar
+        title={t("appName", "Diario Auto")}
+        urgentCount={urgentCount}
+        onOpenMenu={onOpenMenu}
+        onOpenNotifications={onOpenReminders}
+      />
 
-      {activeVehicles.length > 0 && (
-        <section className="dash-quick-actions" aria-label={t("dashboardGarage.quickActions", "Azioni rapide")}>
-          <button type="button" className="dash-quick-action--blue" onClick={onQuickFuel}><span>⛽</span><strong>Rifornimento</strong></button>
-          <button type="button" className="dash-quick-action--blue" onClick={onQuickCharge}><span>⚡</span><strong>Ricarica</strong></button>
-          <button type="button" onClick={() => onQuickKm(activeVehicles[0])}><span>📍</span><strong>{t("dashboardGarage.updateKm", "Aggiorna km")}</strong></button>
+      {primaryVehicle && (
+        <section className="dash-featured-vehicle" onClick={() => onOpenVehicle(primaryVehicle.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onOpenVehicle(primaryVehicle.id)}>
+          <div className="dash-featured-vehicle__photo">
+            <VehicleBodyIcon bodyType={primaryVehicle.bodyType ?? "hatchback"} />
+          </div>
+          <div className="dash-featured-vehicle__info">
+            <span className="dash-featured-vehicle__badge">{t("dashboardGarage.primary", "PRINCIPALE")}</span>
+            <h1 className="dash-featured-vehicle__name">{primaryVehicle.name}</h1>
+            <p className="dash-featured-vehicle__km">
+              {formatDistance(primaryVehicle.currentKm, distanceUnit, locale)}
+              <button
+                type="button"
+                className="dash-featured-vehicle__edit"
+                onClick={(e) => { e.stopPropagation(); onQuickKm(primaryVehicle); }}
+                aria-label={t("dashboardGarage.updateKm", "Aggiorna km")}
+              >
+                ✎
+              </button>
+            </p>
+          </div>
+        </section>
+      )}
+
+      {primaryVehicle && (
+        <section className="dash-gauge-card">
+          <div className="dash-gauge-card__head">
+            <h2>{t("dashboardGarage.cluster", "Cruscotto")}</h2>
+            <button type="button" className="dash-icon-btn" onClick={onOpenStats} aria-label={t("bottomNav.stats", "Statistiche")}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 20 10 12 14 15 20 6" />
+                <path d="M14 6h6v6" />
+              </svg>
+            </button>
+          </div>
+          <VehicleGaugeCluster
+            totalKmLabel={formatDistance(primaryVehicle.currentKm, distanceUnit, locale)}
+            totalKmSubtitle={t("dashboardGarage.totalKm", `${distanceUnit} totali`)}
+            avgConsumption={primaryConsumption}
+            avgConsumptionUnit={t("dashboardGarage.avgConsumptionUnit", "l/100km")}
+          />
+          <VehicleDashboardCluster
+            reminders={reminders.filter((r) => r.vehicleId === primaryVehicle.id)}
+            currentKm={primaryVehicle.currentKm}
+          />
         </section>
       )}
 
       {activeVehicles.length > 0 && (
-        <section className="dash-overview-grid">
-          <OverviewCard icon="💶" label={t("dashboardGarage.monthCost", "Spese questo mese")} value={formatEuro(monthlyCost(fuelEntries, chargingEntries, maintenanceEntries, expenseEntries))} />
-          <OverviewCard icon="🔧" label={t("dashboardGarage.openItems", "Interventi registrati")} value={String(maintenanceEntries.filter(m => activeVehicles.some(v => v.id === m.vehicleId)).length)} />
-          <OverviewCard icon="🔔" label={t("dashboardGarage.urgent", "Scadenze")} value={String(urgentTotal(activeVehicles, reminders))} tone={urgentTotal(activeVehicles, reminders) > 0 ? "warn" : "ok"} />
+        <UpcomingReminders
+          vehicles={activeVehicles}
+          reminders={reminders}
+          distanceUnit={distanceUnit}
+          onOpenReminder={() => onOpenReminder(primaryVehicle?.id ?? activeVehicles[0].id)}
+          onViewAll={onOpenReminders}
+        />
+      )}
+
+      {activeVehicles.length > 0 && (
+        <section className="dash-action-grid">
+          <button type="button" className="dash-action-grid__item dash-action-grid__item--highlight" onClick={onQuickFuel}>
+            <span className="dash-action-grid__icon">⛽</span>
+            <strong>{t("dashboardGarage.quickAction", "AZIONE RAPIDA")}</strong>
+            <span>{t("dashboardGarage.fuel", "Rifornimento")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenMaintenance}>
+            <span className="dash-action-grid__icon">🔧</span>
+            <span>{t("bottomNav.maintenance", "Manutenzione")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenStats}>
+            <span className="dash-action-grid__icon">📊</span>
+            <span>{t("bottomNav.stats", "Statistiche")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenReminders}>
+            <span className="dash-action-grid__icon">📅</span>
+            <span>{t("dashboardGarage.deadlines", "Scadenze")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenDocuments}>
+            <span className="dash-action-grid__icon">📁</span>
+            <span>{t("dashboardGarage.documents", "Documenti")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenReminders}>
+            <span className="dash-action-grid__icon">🔔</span>
+            <span>{t("dashboardGarage.reminders", "Promemoria")}</span>
+          </button>
         </section>
       )}
 

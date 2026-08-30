@@ -15,9 +15,8 @@ import {
   isNotificationSupported,
 } from "../utils/notifications";
 import FuelForm from "./FuelForm";
-import FuelList from "./FuelList";
+import FuelChargeList from "./FuelChargeList";
 import ChargingForm from "./ChargingForm";
-import ChargingList from "./ChargingList";
 import MaintenanceForm from "./MaintenanceForm";
 import MaintenanceList from "./MaintenanceList";
 import MaintenanceOverview from "./MaintenanceOverview";
@@ -275,13 +274,14 @@ export default function VehicleDetail({
                 <button type="button" className="btn btn--ghost" onClick={() => setShowChargingForm(true)}>⚡ Ricarica</button>
               </div>
             </div>
-            <FuelList entries={fuelEntries} onEdit={setEditingFuel} onDelete={onDeleteFuel} />
-            {chargingEntries.length > 0 && (
-              <div className="detail-subsection">
-                <div className="section-head section-head--tight"><h3>Ricariche elettriche</h3></div>
-                <ChargingList entries={chargingEntries} onEdit={setEditingCharging} onDelete={onDeleteCharging} />
-              </div>
-            )}
+            <FuelChargeList
+              fuelEntries={fuelEntries}
+              chargingEntries={chargingEntries}
+              onEditFuel={setEditingFuel}
+              onDeleteFuel={onDeleteFuel}
+              onEditCharging={setEditingCharging}
+              onDeleteCharging={onDeleteCharging}
+            />
           </>
         )}
 

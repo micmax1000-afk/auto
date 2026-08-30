@@ -3,15 +3,23 @@ import type { FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { ChargingEntry, Vehicle } from "../types";
 import { generateId, getHomeChargingDefaults, setHomeChargingDefaults } from "../utils/storage";
+import { getNumberLocale } from "../utils/locale";
+import QuickEntryHeader from "./QuickEntryHeader";
 
 interface Props {
   vehicle: Vehicle;
+  existingEntries?: ChargingEntry[];
   onSave: (entry: ChargingEntry) => void;
   onClose: () => void;
 }
 
-export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
-  const { t } = useTranslation();
+function formatEuro(value: number, locale: string) {
+  return value.toLocaleString(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 4 });
+}
+
+export default function QuickChargeForm({ vehicle, existingEntries = [], onSave, onClose }: Props) {
+  const { t, i18n } = useTranslation();
+  const locale = getNumberLocale(i18n.language);
   const [pricePerKWh, setPricePerKWh] = useState("");
   const [totalCost, setTotalCost] = useState("");
   const [atHome, setAtHome] = useState(false);
@@ -24,6 +32,11 @@ export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
       ? costValue / priceValue
       : null;
 
+  const kmValue = Math.max(0, Math.round(vehicle.currentKm));
+  const previousEntry = [...existingEntries].filter((e) => e.km < kmValue).sort((a, b) => b.km - a.km)[0];
+  const distanceSinceLast = previousEntry ? kmValue - previousEntry.km : null;
+  const costPerKm = distanceSinceLast && distanceSinceLast > 0 && costValue > 0 ? costValue / distanceSinceLast : null;
+
   async function handleToggleAtHome(checked: boolean) {
     setAtHome(checked);
     if (checked && !pricePerKWh) {
@@ -34,7 +47,6 @@ export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const kmValue = Math.max(0, Math.round(vehicle.currentKm));
     if (Number.isNaN(priceValue) || priceValue <= 0) {
       setError(t("chargingForm.errorPrice"));
       return;
@@ -48,7 +60,7 @@ export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
       id: generateId(),
       vehicleId: vehicle.id,
       date: new Date().toISOString(),
-      km: Math.round(kmValue),
+      km: kmValue,
       kWh: costValue / priceValue,
       pricePerKWh: priceValue,
       totalCost: costValue,
@@ -63,81 +75,88 @@ export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
   }
 
   return (
-    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="quick-charge-title">
-      <div className="modal modal--small">
-        <div className="modal__header">
-          <h2 id="quick-charge-title">
-            ⚡ {t("quickEntry.chargeTitle")}
-            <span className="quick-entry__vehicle"> · {vehicle.name}</span>
-          </h2>
-          <button type="button" className="modal__close" onClick={onClose} aria-label={t("common.close")}>
-            ×
-          </button>
+    <div className="quick-entry-page quick-entry-page--green">
+      <QuickEntryHeader title={t("quickEntry.chargeTitle")} onBack={onClose} tone="green" />
+
+      <form onSubmit={handleSubmit} className="quick-entry-page__body">
+        <div className="quick-entry-card">
+          <div className="quick-entry-card__title-row">
+            <span className="quick-entry-card__icon quick-entry-card__icon--green">⚡</span>
+            <div>
+              <strong>{t("quickEntry.chargeTitleFull")}</strong>
+              <p>{vehicle.name}</p>
+            </div>
+          </div>
+          <div className="quick-entry-card__km">
+            <span>{t("quickEntry.currentKmLabel")}</span>
+            <strong>{kmValue.toLocaleString(locale)} km</strong>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="vehicle-form quick-entry">
-          <div className="field field--checkbox">
-            <label htmlFor="qc-home">
-              <input
-                id="qc-home"
-                type="checkbox"
-                checked={atHome}
-                onChange={(e) => handleToggleAtHome(e.target.checked)}
-              />
-              {t("chargingForm.atHome")}
-            </label>
-          </div>
+        <p className="quick-entry-page__section-label">{t("quickEntry.enterOnlyChargeData")}</p>
 
-          <div className="field-row">
-            <div className="field">
-              <label htmlFor="qc-price">{t("chargingForm.price")}</label>
+        <div className="quick-entry-field field--checkbox">
+          <label htmlFor="qc-home">
+            <input
+              id="qc-home"
+              type="checkbox"
+              checked={atHome}
+              onChange={(e) => handleToggleAtHome(e.target.checked)}
+            />
+            {t("chargingForm.atHome")}
+          </label>
+        </div>
+
+        <div className="quick-entry-inputs">
+          <label className="quick-entry-input">
+            <span>{t("chargingForm.price")}</span>
+            <div className="quick-entry-input__row">
               <input
-                id="qc-price"
                 type="number"
                 step="0.001"
                 inputMode="decimal"
                 autoFocus
                 value={pricePerKWh}
                 onChange={(e) => setPricePerKWh(e.target.value)}
-                className="quick-entry__big-input"
               />
+              <small>€/kWh</small>
             </div>
-            <div className="field">
-              <label htmlFor="qc-cost">{t("chargingForm.cost")}</label>
+          </label>
+          <label className="quick-entry-input">
+            <span>{t("chargingForm.cost")}</span>
+            <div className="quick-entry-input__row">
               <input
-                id="qc-cost"
                 type="number"
                 step="0.01"
                 inputMode="decimal"
                 value={totalCost}
                 onChange={(e) => setTotalCost(e.target.value)}
-                className="quick-entry__big-input"
               />
+              <small>€</small>
             </div>
+          </label>
+        </div>
+
+        <div className="quick-entry-calc quick-entry-calc--green">
+          <p className="quick-entry-calc__title">{t("quickEntry.autoCalcTitle")}</p>
+          <div className="quick-entry-calc__row">
+            <span>{t("quickEntry.kwhDispensed")}</span>
+            <strong className="is-positive">{computedKWh !== null ? `${computedKWh.toFixed(2)} kWh` : "—"}</strong>
           </div>
-
-          {computedKWh !== null && <p className="quick-entry__computed">{computedKWh.toFixed(2)} kWh</p>}
-
-          <div className="quick-entry__odometer" aria-label="Chilometraggio automatico">
-            <span>🚗 Km attuali</span>
-            <strong>{vehicle.currentKm.toLocaleString()} km</strong>
-            <small>Presi automaticamente dal contachilometri del veicolo</small>
+          <div className="quick-entry-calc__row">
+            <span>{t("quickEntry.costPerKm")}</span>
+            <strong>{costPerKm !== null ? formatEuro(costPerKm, locale) : "—"}</strong>
           </div>
+        </div>
 
-          {error && <p className="form-error">{error}</p>}
+        {error && <p className="form-error">{error}</p>}
 
-          <div className="modal__actions">
-            <button type="button" className="btn btn--ghost" onClick={onClose}>
-              {t("chargingForm.cancel")}
-            </button>
-            <button type="submit" className="btn btn--primary quick-entry__save">
-              {t("chargingForm.save")}
-            </button>
-          </div>
+        <button type="submit" className="quick-entry-page__save quick-entry-page__save--green">
+          ✓ {t("quickEntry.saveCharge")}
+        </button>
 
-          <p className="quick-entry__full-form-hint">{t("quickEntry.fullFormHint")}</p>
-        </form>
-      </div>
+        <p className="quick-entry__full-form-hint">{t("quickEntry.fullFormHint")}</p>
+      </form>
     </div>
   );
 }

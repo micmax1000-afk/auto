@@ -665,6 +665,12 @@ export default function App() {
             onQuickFuel={() => requestVehicleAction({ kind: "quickFuel" })}
             onQuickCharge={() => requestVehicleAction({ kind: "quickCharge" })}
             onQuickKm={(vehicle) => setQuickKmVehicle(vehicle)}
+            onOpenMenu={() => { setMainTab("impostazioni"); setShowSettings(true); }}
+            onOpenReminder={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
+            onOpenReminders={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
+            onOpenMaintenance={() => requestVehicleAction({ kind: "navigate", tab: "manutenzioni" })}
+            onOpenStats={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
+            onOpenDocuments={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
           />
         )}
 
@@ -751,6 +757,7 @@ export default function App() {
           return (
             <QuickFuelForm
               vehicle={v}
+              existingEntries={fuelEntries.filter((f) => f.vehicleId === v.id)}
               onSave={(entry) => {
                 handleSaveFuel(entry);
                 setQuickFuelVehicleId(null);
@@ -767,6 +774,7 @@ export default function App() {
           return (
             <QuickChargeForm
               vehicle={v}
+              existingEntries={chargingEntries.filter((c) => c.vehicleId === v.id)}
               onSave={(entry) => {
                 handleSaveCharging(entry);
                 setQuickChargeVehicleId(null);
