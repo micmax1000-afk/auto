@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Vehicle, FuelEntry, ChargingEntry, MaintenanceEntry, ExpenseEntry, Reminder } from "../types";
-import { calculateVehicleCosts } from "../utils/calculations";
+import { calculateVehicleCosts, isReminderDue } from "../utils/calculations";
 import { getNumberLocale } from "../utils/locale";
 import { formatDistance } from "../utils/settings";
 import { useAppSettings } from "../contexts/AppSettingsContext";
@@ -20,6 +20,7 @@ import ChargingForm from "./ChargingForm";
 import ChargingList from "./ChargingList";
 import MaintenanceForm from "./MaintenanceForm";
 import MaintenanceList from "./MaintenanceList";
+import MaintenanceOverview from "./MaintenanceOverview";
 import PremiumScreen from "./PremiumScreen";
 import CategoryIcon from "./CategoryIcon";
 import ExpenseForm from "./ExpenseForm";
@@ -33,9 +34,7 @@ import CommutePanel from "./CommutePanel";
 type DetailTab =
   | "live"
   | "rifornimenti"
-  | "ricarica"
   | "manutenzioni"
-  | "spese"
   | "scadenze"
   | "tragitto"
   | "riepilogo";
@@ -63,13 +62,11 @@ interface Props {
   onDeleteReminder: (id: string) => void;
 }
 
-const TAB_IDS: DetailTab[] = ["live", "rifornimenti", "ricarica", "manutenzioni", "spese", "scadenze", "tragitto", "riepilogo"];
+const TAB_IDS: DetailTab[] = ["live", "rifornimenti", "manutenzioni", "scadenze", "tragitto", "riepilogo"];
 const TAB_I18N_KEYS: Record<DetailTab, string> = {
   live: "detail.tabs.live",
   rifornimenti: "detail.tabs.fuel",
-  ricarica: "detail.tabs.charging",
   manutenzioni: "detail.tabs.maintenance",
-  spese: "detail.tabs.expenses",
   scadenze: "detail.tabs.reminders",
   tragitto: "detail.tabs.commute",
   riepilogo: "detail.tabs.summary",
@@ -181,6 +178,8 @@ export default function VehicleDetail({
     }
   }
 
+  const activeRemindersCount = reminders.filter((r) => !r.completed && isReminderDue(r.dueDate, r.dueKm, vehicle.currentKm) !== "ok").length;
+
   const currentYear = new Date().getFullYear();
   const availableYears = Array.from(
     new Set(
@@ -209,11 +208,25 @@ export default function VehicleDetail({
     filteredExpenses,
     filteredCharging,
   );
-  const isMovementsView = tab === "rifornimenti" || tab === "ricarica" || tab === "spese";
-  const viewTitle = isMovementsView ? "Movimenti" : tab === "riepilogo" ? "Statistiche" : vehicle.name;
-  const visibleTabs = isMovementsView
-    ? TAB_IDS.filter((tabId) => tabId === "rifornimenti" || tabId === "ricarica" || tabId === "spese")
-    : [];
+
+  // Consumo reale: usiamo solo i rifornimenti segnati come "pieno",
+  // evitando di presentare come preciso un dato ricavato da rabbocchi parziali.
+  const fullFuel = [...filteredFuel]
+    .filter((e) => e.fullTank && e.liters > 0)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  let consumptionSum = 0;
+  let consumptionSamples = 0;
+  for (let i = 1; i < fullFuel.length; i += 1) {
+    const distance = fullFuel[i].km - fullFuel[i - 1].km;
+    if (distance > 0) {
+      consumptionSum += (fullFuel[i].liters / distance) * 100;
+      consumptionSamples += 1;
+    }
+  }
+  const averageConsumption = consumptionSamples > 0 ? consumptionSum / consumptionSamples : null;
+  const totalChargingKwh = filteredCharging.reduce((sum, e) => sum + (Number(e.kWh) || 0), 0);
+  const averageChargingPrice = totalChargingKwh > 0 ? costs.chargingCost / totalChargingKwh : null;
+  const totalRecordedKm = costs.totalKm;
 
   return (
     <section className="vehicle-detail-page">
@@ -223,12 +236,12 @@ export default function VehicleDetail({
       </button>
 
       <div className="section-head">
-        <h1>{viewTitle}</h1>
+        <h1>{vehicle.name}</h1>
         <span className="detail-km">{formatDistance(vehicle.currentKm, distanceUnit, getNumberLocale(i18n.language))}</span>
       </div>
 
-      {visibleTabs.length > 0 && <nav className="subtabbar subtabbar--movements">
-        {visibleTabs.map((tabId) => (
+      <nav className="subtabbar">
+        {TAB_IDS.map((tabId) => (
           <button
             key={tabId}
             type="button"
@@ -236,9 +249,12 @@ export default function VehicleDetail({
             onClick={() => setTab(tabId)}
           >
             {t(TAB_I18N_KEYS[tabId])}
+            {tabId === "scadenze" && activeRemindersCount > 0 && (
+              <span className="subtabbar__badge">{activeRemindersCount}</span>
+            )}
           </button>
         ))}
-      </nav>}
+      </nav>
 
       <div className="detail-content" key={tab}>
         {tab === "live" && (
@@ -253,24 +269,19 @@ export default function VehicleDetail({
         {tab === "rifornimenti" && (
           <>
             <div className="section-head section-head--tight">
-              <h2>{t("fuel.title")}</h2>
-              <button type="button" className="btn btn--primary" onClick={() => setShowFuelForm(true)}>
-                {t("fuel.add")}
-              </button>
+              <div><h2>Rifornimento</h2><p className="section-subtitle">Carburante e ricarica elettrica</p></div>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                <button type="button" className="btn btn--primary" onClick={() => setShowFuelForm(true)}>⛽ Rifornimento</button>
+                <button type="button" className="btn btn--ghost" onClick={() => setShowChargingForm(true)}>⚡ Ricarica</button>
+              </div>
             </div>
             <FuelList entries={fuelEntries} onEdit={setEditingFuel} onDelete={onDeleteFuel} />
-          </>
-        )}
-
-        {tab === "ricarica" && (
-          <>
-            <div className="section-head section-head--tight">
-              <h2>{t("charging.title")}</h2>
-              <button type="button" className="btn btn--primary" onClick={() => setShowChargingForm(true)}>
-                {t("charging.add")}
-              </button>
-            </div>
-            <ChargingList entries={chargingEntries} onEdit={setEditingCharging} onDelete={onDeleteCharging} />
+            {chargingEntries.length > 0 && (
+              <div className="detail-subsection">
+                <div className="section-head section-head--tight"><h3>Ricariche elettriche</h3></div>
+                <ChargingList entries={chargingEntries} onEdit={setEditingCharging} onDelete={onDeleteCharging} />
+              </div>
+            )}
           </>
         )}
 
@@ -293,21 +304,24 @@ export default function VehicleDetail({
                 </button>
               </div>
             </div>
+            <MaintenanceOverview
+              entries={maintenanceEntries}
+              reminders={reminders}
+              currentKm={vehicle.currentKm}
+              onOpenReminders={() => setTab("scadenze")}
+            />
             <MaintenanceList entries={maintenanceEntries} onDelete={onDeleteMaintenance} />
+
+            <div className="detail-subsection detail-subsection--expenses">
+              <div className="section-head section-head--tight">
+                <div><h3>{t("expenses.title")}</h3><p className="section-subtitle">Spese collegate alla gestione dell'auto</p></div>
+                <button type="button" className="btn btn--ghost" onClick={() => setShowExpenseForm(true)}>+ {t("expenses.add")}</button>
+              </div>
+              <ExpenseList entries={expenseEntries} onDelete={onDeleteExpense} />
+            </div>
           </>
         )}
 
-        {tab === "spese" && (
-          <>
-            <div className="section-head section-head--tight">
-              <h2>{t("expenses.title")}</h2>
-              <button type="button" className="btn btn--primary" onClick={() => setShowExpenseForm(true)}>
-                {t("expenses.add")}
-              </button>
-            </div>
-            <ExpenseList entries={expenseEntries} onDelete={onDeleteExpense} />
-          </>
-        )}
 
         {tab === "scadenze" && (
           <>
@@ -439,6 +453,54 @@ export default function VehicleDetail({
                 </div>
               </div>
             </div>
+            <div className="stat-row stat-row--secondary">
+              <div className="stat-chip stat-chip--icon">
+                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">📏</div>
+                <div>
+                  <span className="stat-chip__label">{t("summary.distance")}</span>
+                  <span className="stat-chip__value">
+                    {totalRecordedKm > 0 ? `${Math.round(totalRecordedKm).toLocaleString(getNumberLocale(i18n.language))} ${distanceUnit}` : "—"}
+                  </span>
+                </div>
+              </div>
+              <div className="stat-chip stat-chip--icon">
+                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">⛽</div>
+                <div>
+                  <span className="stat-chip__label">{t("summary.consumption")}</span>
+                  <span className="stat-chip__value">
+                    {averageConsumption !== null ? `${averageConsumption.toFixed(1)} L/100 km` : "—"}
+                  </span>
+                </div>
+              </div>
+              <div className="stat-chip stat-chip--icon">
+                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">⚡</div>
+                <div>
+                  <span className="stat-chip__label">{t("summary.energy")}</span>
+                  <span className="stat-chip__value">
+                    {totalChargingKwh > 0 ? `${totalChargingKwh.toFixed(1)} kWh` : "—"}
+                  </span>
+                </div>
+              </div>
+              <div className="stat-chip stat-chip--icon">
+                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">€/</div>
+                <div>
+                  <span className="stat-chip__label">{t("summary.averageEnergyPrice")}</span>
+                  <span className="stat-chip__value">
+                    {averageChargingPrice !== null ? formatMoney(averageChargingPrice, 3) + "/kWh" : "—"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="summary-insight">
+              <strong>{t("summary.dataQualityTitle")}</strong>
+              <span>{
+                averageConsumption !== null
+                  ? t("summary.dataQualityConsumption", { count: consumptionSamples })
+                  : t("summary.dataQualityHint")
+              }</span>
+            </div>
+
             <CostChart fuelEntries={filteredFuel} maintenanceEntries={filteredMaintenance} expenseEntries={filteredExpenses} />
           </>
         )}

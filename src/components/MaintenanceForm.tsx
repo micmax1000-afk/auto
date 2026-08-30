@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import type { MaintenanceEntry, MaintenanceCategory, Vehicle } from "../types";
 import { generateId } from "../utils/storage";
 import { compressImage, estimateDataUrlKb } from "../utils/imageCompression";
-import CategoryIcon from "./CategoryIcon";
 
 const CATEGORIES: MaintenanceCategory[] = [
   "tagliando", "gomme", "freni", "olio", "batteria", "raffreddamento", "software", "carrozzeria", "revisione", "altro",
@@ -131,21 +130,12 @@ export default function MaintenanceForm({ vehicle, onSave, onClose }: Props) {
           </div>
 
           <div className="field">
-            <label>{t("maintenanceForm.category")}</label>
-            <div className="category-picker">
+            <label htmlFor="maintenance-category">{t("maintenanceForm.category")}</label>
+            <select id="maintenance-category" value={category} onChange={(e) => setCategory(e.target.value as typeof category)}>
               {CATEGORIES.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`category-picker__item ${category === value ? "is-active" : ""}`}
-                  onClick={() => setCategory(value)}
-                  title={t(`maintenanceCategory.${value}`)}
-                >
-                  <CategoryIcon kind="maintenance" category={value} size="small" />
-                  <span>{t(`maintenanceCategory.${value}`)}</span>
-                </button>
+                <option key={value} value={value}>{t(`maintenanceCategory.${value}`)}</option>
               ))}
-            </div>
+            </select>
           </div>
 
           <div className="field">

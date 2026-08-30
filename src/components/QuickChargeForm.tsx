@@ -12,7 +12,6 @@ interface Props {
 
 export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
   const { t } = useTranslation();
-  const [km, setKm] = useState(String(vehicle.currentKm));
   const [pricePerKWh, setPricePerKWh] = useState("");
   const [totalCost, setTotalCost] = useState("");
   const [atHome, setAtHome] = useState(false);
@@ -35,12 +34,7 @@ export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const kmValue = Number(km);
-
-    if (Number.isNaN(kmValue) || kmValue < 0) {
-      setError(t("chargingForm.errorKm"));
-      return;
-    }
+    const kmValue = Math.max(0, Math.round(vehicle.currentKm));
     if (Number.isNaN(priceValue) || priceValue <= 0) {
       setError(t("chargingForm.errorPrice"));
       return;
@@ -124,15 +118,10 @@ export default function QuickChargeForm({ vehicle, onSave, onClose }: Props) {
 
           {computedKWh !== null && <p className="quick-entry__computed">{computedKWh.toFixed(2)} kWh</p>}
 
-          <div className="field">
-            <label htmlFor="qc-km">{t("chargingForm.km")}</label>
-            <input
-              id="qc-km"
-              type="number"
-              inputMode="numeric"
-              value={km}
-              onChange={(e) => setKm(e.target.value)}
-            />
+          <div className="quick-entry__odometer" aria-label="Chilometraggio automatico">
+            <span>🚗 Km attuali</span>
+            <strong>{vehicle.currentKm.toLocaleString()} km</strong>
+            <small>Presi automaticamente dal contachilometri del veicolo</small>
           </div>
 
           {error && <p className="form-error">{error}</p>}

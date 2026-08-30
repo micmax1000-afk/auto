@@ -8,11 +8,11 @@
 
   /* Accenti: costanti in entrambi i temi */
   --paper: #f3f1ea;
-  --amber: #2b9cff;
-  --amber-dark: #1766c2;
+  --amber: #f5901f;
+  --amber-dark: #c9701a;
   --ok: #3fbb72;
   --danger: #e0563f;
-  --cyan: #65d4ff;
+  --cyan: #38d6c4;
 
   /* Contenuto: si adattano al tema chiaro/scuro (valori di default = scuro) */
   --bg: #0a0c0f;
@@ -1960,7 +1960,7 @@ textarea {
   border-radius: 16px;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(145deg, #142536 0%, #0b1119 100%);
+  background: linear-gradient(145deg, #1a2028 0%, #0d1117 100%);
   border: 1px solid var(--border);
   min-height: 220px;
   display: flex;
@@ -2029,7 +2029,7 @@ textarea {
 }
 
 .dash-hero__btn--ghost:hover {
-  background: rgba(43, 156, 255, 0.14);
+  background: rgba(245, 144, 31, 0.12);
   opacity: 1;
 }
 
@@ -2125,7 +2125,7 @@ textarea {
   font-family: var(--font-display);
   font-size: 1.5rem;
   color: var(--amber);
-  background: linear-gradient(135deg, #142536, #111a24);
+  background: linear-gradient(135deg, #1a2028, #12161b);
 }
 
 .dash-card__body-icon {
@@ -2598,8 +2598,8 @@ textarea {
 }
 
 .dash-cluster__light--amber {
-  color: #2b9cff;
-  filter: drop-shadow(0 0 3px rgba(43, 156, 255, 0.9));
+  color: #f5901f;
+  filter: drop-shadow(0 0 3px rgba(245, 144, 31, 0.9));
 }
 
 .dash-cluster__light--red {
@@ -2784,125 +2784,177 @@ textarea {
   color: var(--paper-dim, #8a93a1);
 }
 
-/* =====================================================
-   V8.2 — interfaccia garage mobile
-   ===================================================== */
-.app {
-  background: #050a0f;
+.bottom-tabbar__label {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(99, 160, 210, 0.18);
-  background: rgba(3, 9, 14, 0.94);
-  backdrop-filter: blur(16px);
+.quick-hub {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem 1rem 6.5rem;
 }
 
-.topbar__inner { max-width: 620px; }
-.topbar__title { font-family: Inter, system-ui, sans-serif; font-size: 1.25rem; font-weight: 800; letter-spacing: 0.025em; }
-.topbar__subtitle, .topbar__pro-btn, .language-switcher, .topbar .theme-toggle:not(:last-child) { display: none; }
-.topbar__actions { margin-left: auto; }
-
-.content:has(.dashboard) {
-  padding: 0 0 6.2rem;
-  background:
-    linear-gradient(180deg, rgba(3, 9, 14, 0.28) 0%, rgba(3, 9, 14, 0.76) 53%, #050a0f 100%),
-    url("/images/garage-hero.jpg") center top / cover fixed;
+.quick-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
 }
 
-.dashboard { max-width: 620px; min-height: calc(100vh - 62px); margin: 0 auto; padding: 0 1.25rem 6.6rem; background: transparent; }
-.dash-hero { min-height: 262px; margin: 0 -1.25rem 0.4rem; border: 0; border-radius: 0; background: transparent; }
-.dash-hero__image-wrap { display: none; }
-.dash-hero__content { max-width: 100%; padding: 1.5rem 1.25rem; align-self: flex-start; }
-.dash-hero__label { display: none; }
-.dash-hero__title { font-family: Inter, system-ui, sans-serif; font-size: 1.6rem; line-height: 1.22; text-shadow: 0 2px 18px #000; }
-.dash-hero__title br { display: none; }
-.dash-hero__title::after { content: ""; display: inline-block; width: 12px; height: 12px; margin-left: 0.45rem; border-radius: 50%; background: #58dc79; box-shadow: 0 0 13px #58dc79; }
-.dash-hero__subtitle { font-family: Inter, system-ui, sans-serif; color: #e6eef6; font-weight: 600; text-shadow: 0 2px 14px #000; }
-
-.dash-quick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; position: relative; z-index: 2; }
-.dash-quick-card { min-height: 104px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.58rem; padding: 0.65rem 0.35rem; color: #f7fbff; border: 1px solid rgba(123, 169, 205, 0.24); border-radius: 13px; background: linear-gradient(145deg, rgba(17, 31, 43, 0.94), rgba(5, 13, 20, 0.92)); box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 8px 18px rgba(0,0,0,.24); font: 600 0.82rem/1.1 Inter, system-ui, sans-serif; cursor: pointer; }
-.dash-quick-card:active { transform: scale(.97); }
-.dash-quick-card__icon { font-family: system-ui, sans-serif; font-size: 2rem; font-weight: 700; line-height: 1; filter: drop-shadow(0 0 9px currentColor); }
-.dash-quick-card--blue { color: #399cff; }.dash-quick-card--green { color: #59dc7a; }.dash-quick-card--amber { color: #ffc331; }.dash-quick-card--violet { color: #aa76ff; }.dash-quick-card--orange { color: #ff9d30; }.dash-quick-card--red { color: #ff5f5f; }.dash-quick-card--cyan { color: #4fe1df; }.dash-quick-card--gold { color: #ffd145; }
-.dash-quick-card span:last-child { color: #f5f8fa; filter: none; }
-
-.dash-vehicles { padding: 1.25rem 0 0; }.dash-vehicles__head { display: none; }.dash-vehicle-list { display: block; }.dash-card { display: flex; min-height: 64px; border-radius: 10px; border-color: rgba(123, 169, 205, 0.32); background: rgba(4, 12, 19, 0.88); }.dash-card:not(:first-child) { display: none; }.dash-card__photo { width: 60px; flex: 0 0 60px; }.dash-card__body { padding: 0.55rem 0.7rem; }.dash-card__name { font-size: 0.95rem; }.dash-card__stats, .dash-card__reminder { display: none; }.dash-card__km { font-size: .82rem; }
-
-.bottom-tabbar { z-index: 50; left: 50%; width: min(620px, 100%); transform: translateX(-50%); border: 1px solid rgba(109, 161, 198, .22); border-bottom: 0; border-radius: 17px 17px 0 0; background: rgba(3, 11, 18, .96); backdrop-filter: blur(18px); padding: .6rem .85rem max(.65rem, env(safe-area-inset-bottom)); }
-.bottom-tabbar__item { min-width: 0; color: #cbd7e1; }.bottom-tabbar__item.is-active { color: #3298ff; }.bottom-tabbar__item svg { width: 25px; height: 25px; }
-
-@media (min-width: 680px) {
-  .app { max-width: 620px; margin: 0 auto; min-height: 100vh; box-shadow: 0 0 60px rgba(0,0,0,.52); }
-}
-
-.content:has(.vehicle-detail-page) { padding: 1rem 1.05rem 6.7rem; background: linear-gradient(rgba(3,9,14,.94), rgba(3,9,14,.98)), url("/images/garage-hero.jpg") center / cover fixed; }
-.vehicle-detail-page { max-width: 620px; margin: 0 auto; }
-.vehicle-detail-page > .section-head { justify-content: center; margin: .2rem 0 1rem; }.vehicle-detail-page > .section-head h1 { font: 800 1.2rem Inter, system-ui, sans-serif; text-transform: uppercase; letter-spacing: .04em; }.detail-km { display: none; }
-.back-link { position: absolute; z-index: 2; margin-top: .18rem; width: 36px; height: 36px; overflow: hidden; font-size: 0; border: 0; border-radius: 9px; color: #f3f7fb; background: rgba(10,22,32,.82); }.back-link::after { content: "☰"; font: 1.35rem/36px system-ui; }
-.subtabbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; overflow: hidden; margin: 0 0 1rem; padding: 0; border: 1px solid rgba(119,166,201,.22); border-radius: 10px; background: rgba(7,18,28,.9); }.subtabbar__item { min-width: 0; padding: .7rem .35rem; border-bottom: 1px solid transparent; font: 600 .7rem/1.1 Inter, system-ui, sans-serif; text-transform: none; color: #e7eff6; }.subtabbar__item.is-active { color: #39a0ff; border-bottom-color: #3298ff; background: linear-gradient(180deg, rgba(39,141,244,.24), rgba(16,72,126,.22)); }
-.vehicle-detail-page .section-head--tight { margin: .6rem 0 .85rem; }.vehicle-detail-page .section-head--tight h2 { font: 700 1rem Inter, system-ui, sans-serif; }
-.record-card, .stat-chip, .chart-wrap, .month-group { border-color: rgba(118,166,199,.25); background: linear-gradient(145deg, rgba(15,32,45,.92), rgba(6,16,25,.94)); box-shadow: inset 0 1px rgba(255,255,255,.025); }.record-card { border-radius: 12px; }.stat-chip { border-radius: 11px; }.period-filter { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid rgba(118,166,199,.25); border-radius: 10px; overflow: hidden; }.period-filter__btn { border: 0; border-radius: 0; font: 600 .78rem Inter, system-ui, sans-serif; }.period-filter__btn.is-active { background: linear-gradient(135deg, #2d9dff, #1661cb); }
-
-/* Sfondo officina persistente: le superfici restano opache per conservare contrasto e leggibilita. */
-.content {
-  background:
-    linear-gradient(180deg, rgba(3, 9, 14, 0.89), rgba(3, 9, 14, 0.96)),
-    url("/images/garage-hero.jpg") center / cover fixed;
-}
-
-.dash-vehicles__head {
-  display: flex;
-  margin: 0 0 .55rem;
-  padding: 0 .15rem;
-}
-
-.dash-vehicles__head h2 {
-  font: 700 .86rem Inter, system-ui, sans-serif;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: #b9c8d5;
-}
-
-.dash-vehicles__head .dash-link:first-child {
-  padding: .4rem .7rem;
-  border: 1px solid rgba(105, 164, 208, .42);
-  border-radius: 8px;
-  color: #f3f8fc;
-  background: rgba(9, 26, 39, .86);
-}
-
-.dash-vehicles__head .dash-link:not(:first-child) { display: none; }
-
-.dash-card { align-items: center; }
-.dash-card__body { flex: 1; min-width: 0; }
-.dash-card__switch {
-  flex: none;
-  margin-right: .55rem;
-  padding: .48rem .65rem;
-  border: 1px solid rgba(105, 164, 208, .5);
-  border-radius: 8px;
-  color: #f4f8fb;
-  background: rgba(18, 40, 57, .9);
-  font: 700 .68rem Inter, system-ui, sans-serif;
-  text-transform: uppercase;
+.quick-hub__card,
+.quick-hub__menu-item {
+  border: 1px solid var(--chrome-border);
+  background: var(--surface, var(--asphalt));
+  color: var(--chrome-text);
+  border-radius: 12px;
   cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
 }
 
-.subtabbar--movements { grid-template-columns: repeat(3, 1fr); }
-.vehicle-detail-page .section-head--tight > .btn--primary {
-  min-width: 42px;
-  height: 42px;
-  padding: 0;
-  border-radius: 50%;
-  font-size: 0;
-  background: linear-gradient(135deg, #3babff, #1767d9);
-  box-shadow: 0 7px 16px rgba(28, 130, 240, .35);
+.quick-hub__card { min-height: 130px; padding: 1rem; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: .35rem; }
+.quick-hub__card:hover, .quick-hub__menu-item:hover { transform: translateY(-1px); border-color: var(--amber); }
+.quick-hub__card strong, .quick-hub__menu-item strong { color: var(--chrome-text); }
+.quick-hub__card span:last-child { color: var(--chrome-text-muted); font-size: .78rem; }
+.quick-hub__icon { font-size: 1.8rem; }
+.quick-hub__menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.quick-hub__menu-item { min-height: 62px; padding: .85rem 1rem; display: flex; align-items: center; gap: .75rem; text-align: left; }
+.quick-hub__menu-item span { font-size: 1.25rem; }
+
+@media (max-width: 520px) {
+  .bottom-tabbar { padding-top: .35rem; }
+  .bottom-tabbar__item { padding: .45rem .1rem .5rem; }
+  .bottom-tabbar__item svg { width: 21px; height: 21px; }
+  .bottom-tabbar__label { font-size: .56rem; }
+  .quick-hub__grid { grid-template-columns: 1fr; }
+  .quick-hub__card { min-height: 84px; }
+  .quick-hub__menu { grid-template-columns: 1fr; }
 }
-.vehicle-detail-page .section-head--tight > .btn--primary::after { content: "+"; font: 300 2rem/38px Inter, system-ui, sans-serif; }
-.vehicle-detail-page .stat-row { grid-template-columns: repeat(3, 1fr); gap: .55rem; }
-.vehicle-detail-page .stat-chip { min-height: 88px; justify-content: center; }
-.vehicle-detail-page .stat-chip__value { font-size: 1.05rem; }
+
+
+/* V7.3 — Garage dashboard */
+.dash-hero--compact { min-height: 210px; }
+.dash-hero__today { margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; min-width:150px; padding:1rem 1.15rem; border:1px solid var(--border-color, rgba(127,127,127,.2)); border-radius:18px; background:var(--card-bg, rgba(255,255,255,.55)); }
+.dash-hero__today span { font-size:1.35rem; }
+.dash-hero__today strong { font-size:2rem; line-height:1; }
+.dash-hero__today small { opacity:.72; text-align:right; margin-top:.35rem; }
+.dash-quick-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.8rem; margin:1rem 0; }
+.dash-quick-actions button { display:flex; align-items:center; gap:.65rem; min-height:58px; padding:.8rem 1rem; border:1px solid var(--border-color, rgba(127,127,127,.2)); border-radius:16px; background:var(--card-bg, rgba(255,255,255,.7)); color:inherit; cursor:pointer; text-align:left; }
+.dash-quick-actions button:hover { transform:translateY(-1px); }
+.dash-quick-actions span { font-size:1.3rem; }
+.dash-overview-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.8rem; margin:0 0 1.5rem; }
+.dash-overview-card { display:flex; align-items:center; gap:.8rem; padding:1rem; border:1px solid var(--border-color, rgba(127,127,127,.2)); border-radius:16px; background:var(--card-bg, rgba(255,255,255,.7)); }
+.dash-overview-card > span { font-size:1.4rem; }
+.dash-overview-card small { display:block; opacity:.68; }
+.dash-overview-card strong { display:block; font-size:1.15rem; margin-top:.15rem; }
+.dash-overview-card--warn { border-color:color-mix(in srgb, currentColor 25%, transparent); }
+@media (max-width:700px) {
+  .dash-hero--compact { min-height:unset; }
+  .dash-hero__today { margin:0; min-width:0; align-items:flex-start; }
+  .dash-hero__today small { text-align:left; }
+  .dash-quick-actions { grid-template-columns:1fr 1fr 1fr; gap:.5rem; }
+  .dash-quick-actions button { flex-direction:column; justify-content:center; gap:.25rem; min-height:72px; padding:.5rem .35rem; text-align:center; font-size:.78rem; }
+  .dash-overview-grid { grid-template-columns:1fr 1fr; }
+  .dash-overview-card:last-child { grid-column:1 / -1; }
+}
+
+/* V7.4 - maintenance overview */
+.maintenance-overview {
+  margin: 0 0 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border-color, rgba(127,127,127,.18));
+  border-radius: 18px;
+  background: var(--card-bg, rgba(127,127,127,.06));
+}
+.maintenance-overview__header { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.9rem; }
+.maintenance-overview__header h3 { margin:.15rem 0 0; font-size:1.05rem; }
+.eyebrow { font-size:.68rem; font-weight:800; letter-spacing:.09em; opacity:.62; }
+.maintenance-overview__grid { display:grid; grid-template-columns:2fr repeat(3,1fr); gap:.65rem; }
+.maintenance-overview__status,.maintenance-overview__metric { min-height:72px; padding:.8rem; border-radius:14px; background:var(--surface, rgba(127,127,127,.08)); }
+.maintenance-overview__status { display:flex; align-items:center; gap:.7rem; }
+.maintenance-overview__status.is-danger { border:1px solid rgba(220,60,60,.3); }
+.maintenance-overview__status.is-warning { border:1px solid rgba(220,160,40,.3); }
+.maintenance-overview__status.is-ok { border:1px solid rgba(60,170,100,.25); }
+.maintenance-overview__icon { width:30px; height:30px; display:grid; place-items:center; border-radius:50%; font-weight:900; background:currentColor; color:var(--card-bg,#fff); }
+.maintenance-overview__status strong,.maintenance-overview__status span { display:block; }
+.maintenance-overview__status span:not(.maintenance-overview__icon) { margin-top:.15rem; font-size:.75rem; opacity:.7; }
+.maintenance-overview__metric span,.maintenance-overview__last span { display:block; font-size:.72rem; opacity:.65; }
+.maintenance-overview__metric strong { display:block; margin-top:.35rem; font-size:1.05rem; }
+.maintenance-overview__last { margin-top:.65rem; display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:1rem; padding:.8rem; border-top:1px solid var(--border-color, rgba(127,127,127,.12)); }
+.maintenance-overview__last strong { display:block; margin-top:.15rem; }
+.maintenance-overview__empty { padding:.75rem 0 0; font-size:.82rem; opacity:.7; }
+@media (max-width: 700px) {
+  .maintenance-overview__header { align-items:flex-start; }
+  .maintenance-overview__grid { grid-template-columns:1fr 1fr; }
+  .maintenance-overview__status { grid-column:1 / -1; }
+  .maintenance-overview__last { grid-template-columns:1fr auto; }
+  .maintenance-overview__last > strong { grid-column:1 / -1; }
+}
+
+/* V7.8 — KPI secondari e nota qualità dati nella dashboard statistiche */
+.stat-row--secondary {
+  margin-top: 0.25rem;
+}
+.summary-insight {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.5rem 0 1rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border, #262d36);
+  border-radius: 12px;
+  background: var(--surface-2, rgba(255,255,255,0.025));
+  font-size: 0.82rem;
+}
+.summary-insight strong {
+  font-size: 0.85rem;
+}
+.summary-insight span {
+  opacity: 0.72;
+  line-height: 1.45;
+}
+@media (max-width: 620px) {
+  .stat-row--secondary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* V8.3 mobile UX */
+.quick-hub__card--primary{border-color:rgba(45,140,255,.65)}
+.quick-hub__icon--blue{color:#2d8cff;filter:drop-shadow(0 0 7px rgba(45,140,255,.35))}
+.quick-hub__hint{margin-top:.85rem;padding:.75rem .9rem;border-radius:12px;background:rgba(45,140,255,.08);color:var(--chrome-text-muted);font-size:.78rem}
+.quick-entry__odometer{display:flex;flex-direction:column;gap:.2rem;padding:.8rem .9rem;margin:.15rem 0 .4rem;border:1px solid rgba(45,140,255,.4);border-radius:14px;background:rgba(45,140,255,.07)}
+.quick-entry__odometer span{font-size:.74rem;color:var(--chrome-text-muted)}
+.quick-entry__odometer strong{font-family:var(--font-mono);font-size:1.2rem;color:#2d8cff}
+.quick-entry__odometer small{font-size:.7rem;color:var(--chrome-text-muted)}
+.detail-subsection{margin-top:1.2rem;padding-top:1.1rem;border-top:1px solid var(--chrome-border)}
+.detail-subsection--expenses{margin-top:1.5rem}
+.dash-quick-action--blue span{color:#2d8cff}
+.dash-quick-action--blue{border-color:rgba(45,140,255,.32)!important}
+.bottom-tabbar{pointer-events:auto;isolation:isolate;padding-bottom:calc(.75rem + env(safe-area-inset-bottom))}
+.bottom-tabbar__item{position:relative;z-index:1;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:52px}
+.bottom-tabbar__item:active{transform:translateY(1px)}
+.content{padding-bottom:7.5rem}
+@media(max-width:600px){
+ .dash-hero{margin:.55rem .65rem 1rem;min-height:180px}
+ .dash-hero__content{padding:1rem;max-width:100%;padding-right:36%}
+ .dash-hero__title{font-size:1.35rem}
+ .dash-hero__today{min-width:auto;padding:.55rem .7rem}
+ .dash-hero__today strong{font-size:1.45rem}
+ .dash-quick-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem;margin:.65rem}
+ .dash-quick-actions button{min-height:62px;padding:.65rem .75rem}
+ .dash-quick-actions button:last-child{grid-column:1/-1}
+ .dash-overview-grid{grid-template-columns:1fr;margin:.65rem}
+ .dash-vehicles{padding:0 .65rem}
+ .dash-card{grid-template-columns:1fr}
+ .dash-card__photo{min-height:120px}
+ .dash-card__top{align-items:flex-start;gap:.65rem}
+ .dash-card__km{font-size:1rem;white-space:nowrap}
+ .quick-hub{padding:.65rem .65rem 7.5rem}
+ .quick-hub__grid{grid-template-columns:1fr}
+ .vehicle-grid{grid-template-columns:1fr}
+ .modal{width:calc(100vw - 1rem);max-height:calc(100dvh - 1rem)}
+}

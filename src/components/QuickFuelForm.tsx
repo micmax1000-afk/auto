@@ -22,7 +22,6 @@ function defaultSource(vehicle: Vehicle): FuelSource {
 export default function QuickFuelForm({ vehicle, onSave, onClose }: Props) {
   const { t } = useTranslation();
   const source = defaultSource(vehicle);
-  const [km, setKm] = useState(String(vehicle.currentKm));
   const [pricePerUnit, setPricePerUnit] = useState("");
   const [totalCost, setTotalCost] = useState("");
   const [fullTank, setFullTank] = useState(true);
@@ -37,12 +36,7 @@ export default function QuickFuelForm({ vehicle, onSave, onClose }: Props) {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const kmValue = Number(km);
-
-    if (Number.isNaN(kmValue) || kmValue < 0) {
-      setError(t("fuelForm.errorKm"));
-      return;
-    }
+    const kmValue = Math.max(0, Math.round(vehicle.currentKm));
     if (Number.isNaN(priceValue) || priceValue <= 0) {
       setError(t("fuelForm.errorPrice", { unit: "l" }));
       return;
@@ -114,15 +108,10 @@ export default function QuickFuelForm({ vehicle, onSave, onClose }: Props) {
             </p>
           )}
 
-          <div className="field">
-            <label htmlFor="qf-km">{t("fuelForm.km")}</label>
-            <input
-              id="qf-km"
-              type="number"
-              inputMode="numeric"
-              value={km}
-              onChange={(e) => setKm(e.target.value)}
-            />
+          <div className="quick-entry__odometer" aria-label="Chilometraggio automatico">
+            <span>🚗 Km attuali</span>
+            <strong>{vehicle.currentKm.toLocaleString()} km</strong>
+            <small>Presi automaticamente dal contachilometri del veicolo</small>
           </div>
 
           <div className="field field--checkbox">

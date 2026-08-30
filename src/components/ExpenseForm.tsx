@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import type { ExpenseEntry, ExpenseCategory, Vehicle } from "../types";
 import { generateId } from "../utils/storage";
 import { compressImage, estimateDataUrlKb } from "../utils/imageCompression";
-import CategoryIcon from "./CategoryIcon";
 
 const CATEGORIES: ExpenseCategory[] = ["assicurazione", "bollo", "multa", "documenti", "altro"];
 
@@ -85,21 +84,12 @@ export default function ExpenseForm({ vehicle, onSave, onClose }: Props) {
           </div>
 
           <div className="field">
-            <label>{t("expenseForm.category")}</label>
-            <div className="category-picker">
+            <label htmlFor="expense-category">{t("expenseForm.category")}</label>
+            <select id="expense-category" value={category} onChange={(e) => setCategory(e.target.value as typeof category)}>
               {CATEGORIES.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`category-picker__item ${category === value ? "is-active" : ""}`}
-                  onClick={() => setCategory(value)}
-                  title={t(`expenseCategory.${value}`)}
-                >
-                  <CategoryIcon kind="expense" category={value} size="small" />
-                  <span>{t(`expenseCategory.${value}`)}</span>
-                </button>
+                <option key={value} value={value}>{t(`expenseCategory.${value}`)}</option>
               ))}
-            </div>
+            </select>
           </div>
 
           <div className="field">

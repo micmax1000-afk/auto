@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { Vehicle, Reminder, MaintenanceEntry } from "../types";
+import type { Vehicle, Reminder, MaintenanceEntry, FuelEntry, ChargingEntry, ExpenseEntry } from "../types";
 import { isReminderDue } from "../utils/calculations";
 import { getNumberLocale } from "../utils/locale";
 import { formatDistance, kmToDisplayDistance, type DistanceUnit } from "../utils/settings";
@@ -11,11 +11,16 @@ interface Props {
   vehicles: Vehicle[];
   reminders: Reminder[];
   maintenanceEntries: MaintenanceEntry[];
+  fuelEntries: FuelEntry[];
+  chargingEntries: ChargingEntry[];
+  expenseEntries: ExpenseEntry[];
   isPro: boolean;
   onOpenVehicle: (id: string) => void;
   onAddVehicle: () => void;
   onManageVehicles: () => void;
-  onShortcut: (destination: "fuel" | "maintenance" | "reminders" | "statistics" | "live" | "backup" | "premium") => void;
+  onQuickFuel: () => void;
+  onQuickCharge: () => void;
+  onQuickKm: (vehicle: Vehicle) => void;
 }
 
 function getNextReminder(
@@ -64,15 +69,46 @@ function getMaintenanceStatus(
   return { label: t("dashboardGarage.maintenanceOk"), ok: true };
 }
 
+function formatEuro(value: number) {
+  return value.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+}
+
+function monthlyCost(fuel: FuelEntry[], charging: ChargingEntry[], maintenance: MaintenanceEntry[], expenses: ExpenseEntry[]) {
+  const now = new Date();
+  const sameMonth = (date: string) => { const d = new Date(date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); };
+  return [...fuel, ...charging, ...maintenance, ...expenses].reduce((sum, e) => {
+    const cost = "totalCost" in e ? e.totalCost : "cost" in e ? e.cost : e.amount;
+    return sameMonth(e.date) ? sum + (Number(cost) || 0) : sum;
+  }, 0);
+}
+
+function urgentTotal(vehicles: Vehicle[], reminders: Reminder[]) {
+  const ids = new Set(vehicles.map(v => v.id));
+  const reminderCount = reminders.filter(r => ids.has(r.vehicleId) && !r.completed).filter(r => {
+    const v = vehicles.find(x => x.id === r.vehicleId);
+    return v ? isReminderDue(r.dueDate, r.dueKm, v.currentKm) !== "ok" : false;
+  }).length;
+  return reminderCount;
+}
+
+function OverviewCard({ icon, label, value, tone }: { icon: string; label: string; value: string; tone?: "warn" | "ok" }) {
+  return <article className={`dash-overview-card ${tone ? `dash-overview-card--${tone}` : ""}`}><span>{icon}</span><div><small>{label}</small><strong>{value}</strong></div></article>;
+}
+
 export default function Dashboard({
   vehicles,
   reminders,
   maintenanceEntries,
+  fuelEntries,
+  chargingEntries,
+  expenseEntries,
   isPro,
   onOpenVehicle,
   onAddVehicle,
   onManageVehicles,
-  onShortcut,
+  onQuickFuel,
+  onQuickCharge,
+  onQuickKm,
 }: Props) {
   const { t, i18n } = useTranslation();
   const { distanceUnit } = useAppSettings();
@@ -81,61 +117,35 @@ export default function Dashboard({
 
   return (
     <div className="dashboard">
-      {/* HERO */}
-      <section className="dash-hero">
+      {/* HERO / TODAY */}
+      <section className="dash-hero dash-hero--compact">
         <div className="dash-hero__content">
-          <p className="dash-hero__label">{t("dashboardGarage.heroLabel")}</p>
-          <h1 className="dash-hero__title">
-            {t("dashboardGarage.heroTitleLine1")}
-            <br />
-            {t("dashboardGarage.heroTitleLine2")}
-          </h1>
-          <p className="dash-hero__subtitle">{t("dashboardGarage.heroSubtitle")}</p>
+          <p className="dash-hero__label">GARAGE AUTO</p>
+          <h1 className="dash-hero__title">Il tuo garage<br />sempre sotto controllo</h1>
+          <p className="dash-hero__subtitle">Manutenzione, rifornimenti e scadenze in un unico posto.</p>
         </div>
-        <div className="dash-hero__image-wrap">
-          <picture>
-            <source srcSet={`${import.meta.env.BASE_URL}images/garage-hero.webp`} type="image/webp" />
-            <img
-              src={`${import.meta.env.BASE_URL}images/garage-hero.jpg`}
-              alt=""
-              className="dash-hero__image"
-              width={1168}
-              height={784}
-              fetchPriority="high"
-            />
-          </picture>
+        <div className="dash-hero__today">
+          <span>⚡</span>
+          <strong>{urgentTotal(activeVehicles, reminders)}</strong>
+          <small>{t("dashboardGarage.actionsNeeded", "attenzioni da controllare")}</small>
         </div>
       </section>
 
-      <section className="dash-quick-grid" aria-label="Azioni rapide">
-        <button type="button" className="dash-quick-card dash-quick-card--blue" onClick={() => activeVehicles[0] && onOpenVehicle(activeVehicles[0].id)}>
-          <span className="dash-quick-card__icon" aria-hidden="true">⌁</span><span>Dashboard</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--green" onClick={() => onShortcut("fuel")}>
-          <span className="dash-quick-card__icon" aria-hidden="true">⛽</span><span>Movimenti</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--amber" onClick={() => onShortcut("maintenance")}>
-          <span className="dash-quick-card__icon" aria-hidden="true">🔧</span><span>Manutenzione</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--violet" onClick={() => onShortcut("reminders")}>
-          <span className="dash-quick-card__icon" aria-hidden="true">▣</span><span>Scadenze</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--orange" onClick={() => onShortcut("statistics")}>
-          <span className="dash-quick-card__icon" aria-hidden="true">◔</span><span>Statistiche</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--red" onClick={() => onShortcut("live")}>
-          <span className="dash-quick-card__icon" aria-hidden="true">▱</span><span>OBD</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--blue" onClick={() => onShortcut("backup")}>
-          <span className="dash-quick-card__icon" aria-hidden="true">▰</span><span>Documenti</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--cyan" onClick={onManageVehicles}>
-          <span className="dash-quick-card__icon" aria-hidden="true">⌘</span><span>Veicoli</span>
-        </button>
-        <button type="button" className="dash-quick-card dash-quick-card--gold" onClick={() => onShortcut("premium")}>
-          <span className="dash-quick-card__icon" aria-hidden="true">♛</span><span>Premium</span>
-        </button>
-      </section>
+      {activeVehicles.length > 0 && (
+        <section className="dash-quick-actions" aria-label={t("dashboardGarage.quickActions", "Azioni rapide")}>
+          <button type="button" className="dash-quick-action--blue" onClick={onQuickFuel}><span>⛽</span><strong>Rifornimento</strong></button>
+          <button type="button" className="dash-quick-action--blue" onClick={onQuickCharge}><span>⚡</span><strong>Ricarica</strong></button>
+          <button type="button" onClick={() => onQuickKm(activeVehicles[0])}><span>📍</span><strong>{t("dashboardGarage.updateKm", "Aggiorna km")}</strong></button>
+        </section>
+      )}
+
+      {activeVehicles.length > 0 && (
+        <section className="dash-overview-grid">
+          <OverviewCard icon="💶" label={t("dashboardGarage.monthCost", "Spese questo mese")} value={formatEuro(monthlyCost(fuelEntries, chargingEntries, maintenanceEntries, expenseEntries))} />
+          <OverviewCard icon="🔧" label={t("dashboardGarage.openItems", "Interventi registrati")} value={String(maintenanceEntries.filter(m => activeVehicles.some(v => v.id === m.vehicleId)).length)} />
+          <OverviewCard icon="🔔" label={t("dashboardGarage.urgent", "Scadenze")} value={String(urgentTotal(activeVehicles, reminders))} tone={urgentTotal(activeVehicles, reminders) > 0 ? "warn" : "ok"} />
+        </section>
+      )}
 
       {/* VEICOLI */}
       <section className="dash-vehicles">
@@ -216,16 +226,6 @@ export default function Dashboard({
                       </div>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    className="dash-card__switch"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onManageVehicles();
-                    }}
-                  >
-                    {t("dashboardGarage.manage")}
-                  </button>
                 </article>
               );
             })}
