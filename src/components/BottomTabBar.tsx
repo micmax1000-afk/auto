@@ -24,7 +24,7 @@ export default function BottomTabBar({ active, onChange, urgentCount = 0 }: Prop
   return <nav className="bottom-tabbar" aria-label={t("bottomNav.ariaLabel")}>
     {items.map((item) => <button key={item.id} type="button" className={`bottom-tabbar__item ${active === item.id ? "is-active" : ""}`} onClick={() => onChange(item.id)} title={item.label} aria-label={item.label}>
       <span className="bottom-tabbar__icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><Icon name={item.icon} /></svg>
-        {item.id === "altro" && urgentCount > 0 && <span className="bottom-tabbar__badge">{urgentCount > 9 ? "9+" : urgentCount}</span>}
+        {item.id === "manutenzione" && urgentCount > 0 && <span className="bottom-tabbar__badge">{urgentCount > 9 ? "9+" : urgentCount}</span>}
       </span><span className="bottom-tabbar__label">{item.label}</span>
     </button>)}
   </nav>;
