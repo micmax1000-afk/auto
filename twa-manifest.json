@@ -39,5 +39,7 @@
   "fullScopeUrl": "https://diario-auto.mic-max-1000.workers.dev/",
   "minSdkVersion": 21,
   "orientation": "portrait",
-  "fingerprints": []
+  "fingerprints": [],
+  "versionName": "1.2.0",
+  "versionCode": 3
 }

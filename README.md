@@ -68,7 +68,7 @@ npm run dev      # sviluppo locale
 npm run build    # build di produzione (cartella dist/)
 ```
 
-## Pubblicazione su Cloudflare Pages
+## Pubblicazione su Cloudflare Workers
 
 1. Crea su GitHub un repository pubblico chiamato **diario-auto** (senza inizializzarlo con README), poi da terminale, dentro questa cartella:
    ```
@@ -87,7 +87,7 @@ npm run build    # build di produzione (cartella dist/)
 
 L'app viene pubblicata **alla radice del dominio** (non sotto un sottopercorso come con GitHub Pages), quindi non serve modificare `base` in `vite.config.ts` qualunque nome tu scelga per il repository — resta sempre `/`.
 
-Se in seguito aggiungi un dominio personalizzato: **Cloudflare Pages → il tuo progetto → Custom domains**.
+Se in seguito aggiungi un dominio personalizzato: **Cloudflare Workers → il tuo progetto → Custom domains**.
 
 ## Possibili sviluppi futuri
 - Registrazione automatica di km e livello carburante nei rifornimenti a partire dai dati Live
@@ -98,3 +98,24 @@ Se in seguito aggiungi un dominio personalizzato: **Cloudflare Pages → il tuo 
 ## Licenza
 
 © 2026 micmax1000-afk. Tutti i diritti riservati. Il repository è pubblico per trasparenza (in particolare per permettere la verifica indipendente di [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)) e come portfolio, ma **non** è open source: uso, copia, modifica o ridistribuzione non sono consentiti senza permesso scritto. Dettagli completi in [LICENSE](./LICENSE).
+
+
+## V7.2 — Navigazione mobile
+
+- Bottom navigation ridotta a 5 aree: Garage, Movimenti, Manutenzione, Statistiche, Altro.
+- Rifornimenti e ricariche sono raccolti in Movimenti con azioni rapide.
+- Funzioni secondarie (promemoria, veicoli, backup, impostazioni, pneumatici) sono raccolte in Altro.
+- Il tema è accessibile dalle Impostazioni invece che dalla barra superiore.
+- Badge delle scadenze urgenti spostato su Altro.
+- Nessuna funzione dati esistente è stata rimossa.
+
+
+## Cloudflare Workers
+
+Il progetto usa Cloudflare Workers Static Assets e pubblica la build Vite dalla cartella `dist`.
+
+```bash
+npm ci
+npm run build
+npm run deploy
+```
