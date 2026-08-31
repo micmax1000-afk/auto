@@ -4,7 +4,6 @@ import QuickEntryHeader from "./QuickEntryHeader";
 interface Props {
   onClose: () => void;
   onOpenReminders: () => void;
-  onOpenDocuments: () => void;
   onOpenExpenses: () => void;
   onOpenTireCalc: () => void;
   onOpenCommute: () => void;
@@ -23,7 +22,6 @@ const ROW_ICONS: Record<string, string> = {
 export default function UtilitiesScreen({
   onClose,
   onOpenReminders,
-  onOpenDocuments,
   onOpenExpenses,
   onOpenTireCalc,
   onOpenCommute,
@@ -39,12 +37,6 @@ export default function UtilitiesScreen({
         <div className="settings-row" onClick={onOpenReminders} role="button" tabIndex={0}>
           <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.calendar} /></svg></span>
           <span className="settings-row__label">{t("dashboardGarage.deadlines", "Scadenze")}</span>
-          <span className="settings-row__chevron">›</span>
-        </div>
-
-        <div className="settings-row" onClick={onOpenDocuments} role="button" tabIndex={0}>
-          <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.folder} /></svg></span>
-          <span className="settings-row__label">{t("dashboardGarage.documents", "Documenti")}</span>
           <span className="settings-row__chevron">›</span>
         </div>
 

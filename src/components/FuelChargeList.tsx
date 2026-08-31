@@ -5,7 +5,7 @@ import { calculateConsumption, averageConsumption } from "../utils/calculations"
 import { getNumberLocale } from "../utils/locale";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { kmToDisplayDistance } from "../utils/settings";
-import CategoryIcon from "./CategoryIcon";
+import ActionGridIcon from "./ActionGridIcon";
 
 type Filter = "all" | "fuel" | "electric";
 type Period = "all" | "12m" | "6m" | "3m";
@@ -129,7 +129,7 @@ export default function FuelChargeList({
           return (
             <div key={entry.id} className="fc-item">
               <div className={`fc-item__icon fc-item__icon--${isFuel ? "fuel" : "charge"}`}>
-                <CategoryIcon kind="fuel" category={isFuel ? (entry as FuelEntry).source : "elettrico"} />
+                <ActionGridIcon name={isFuel ? "fuel" : "bolt"} />
               </div>
               <div className="fc-item__body">
                 <div className="fc-item__top">

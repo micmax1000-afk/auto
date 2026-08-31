@@ -52,42 +52,6 @@ export default function Dashboard({
 
   return (
     <div className="dashboard">
-      {activeVehicles.length > 0 && (
-        <UpcomingReminders
-          vehicles={activeVehicles}
-          reminders={reminders}
-          distanceUnit={distanceUnit}
-          onOpenReminder={() => onOpenReminder(primaryVehicle?.id ?? activeVehicles[0].id)}
-          onViewAll={onOpenReminders}
-        />
-      )}
-
-      {activeVehicles.length > 0 && (
-        <section className="dash-action-grid">
-          <button type="button" className="dash-action-grid__item dash-action-grid__item--highlight" onClick={onQuickFuel}>
-            <ActionGridIcon name="fuel" className="dash-action-grid__icon dash-action-grid__icon--green" />
-            <strong>{t("dashboardGarage.quickAction", "AZIONE RAPIDA")}</strong>
-            <span>{t("dashboardGarage.fuel", "Rifornimento")}</span>
-          </button>
-          <button type="button" className="dash-action-grid__item" onClick={onOpenMaintenance}>
-            <ActionGridIcon name="wrench" className="dash-action-grid__icon dash-action-grid__icon--orange" />
-            <span>{t("bottomNav.maintenance", "Manutenzione")}</span>
-          </button>
-          <button type="button" className="dash-action-grid__item" onClick={onOpenStats}>
-            <ActionGridIcon name="chart" className="dash-action-grid__icon dash-action-grid__icon--blue" />
-            <span>{t("bottomNav.stats", "Statistiche")}</span>
-          </button>
-          <button type="button" className="dash-action-grid__item" onClick={onOpenUtilities}>
-            <ActionGridIcon name="folder" className="dash-action-grid__icon dash-action-grid__icon--yellow" />
-            <span>{t("utilities.title", "Utilità")}</span>
-          </button>
-          <button type="button" className="dash-action-grid__item" onClick={onOpenReminders}>
-            <ActionGridIcon name="bell" className="dash-action-grid__icon dash-action-grid__icon--red" />
-            <span>{t("dashboardGarage.reminders", "Promemoria")}</span>
-          </button>
-        </section>
-      )}
-
       {/* VEICOLI */}
       <section className="dash-vehicles">
         <div className="dash-vehicles__head">
@@ -155,6 +119,42 @@ export default function Dashboard({
           </div>
         )}
       </section>
+
+      {activeVehicles.length > 0 && (
+        <UpcomingReminders
+          vehicles={activeVehicles}
+          reminders={reminders}
+          distanceUnit={distanceUnit}
+          onOpenReminder={() => onOpenReminder(primaryVehicle?.id ?? activeVehicles[0].id)}
+          onViewAll={onOpenReminders}
+        />
+      )}
+
+      {activeVehicles.length > 0 && (
+        <section className="dash-action-grid">
+          <button type="button" className="dash-action-grid__item dash-action-grid__item--highlight" onClick={onQuickFuel}>
+            <ActionGridIcon name="fuel" className="dash-action-grid__icon dash-action-grid__icon--green" />
+            <strong>{t("dashboardGarage.quickAction", "AZIONE RAPIDA")}</strong>
+            <span>{t("dashboardGarage.fuel", "Rifornimento")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenMaintenance}>
+            <ActionGridIcon name="wrench" className="dash-action-grid__icon dash-action-grid__icon--orange" />
+            <span>{t("bottomNav.maintenance", "Manutenzione")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenStats}>
+            <ActionGridIcon name="chart" className="dash-action-grid__icon dash-action-grid__icon--blue" />
+            <span>{t("bottomNav.stats", "Statistiche")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenUtilities}>
+            <ActionGridIcon name="folder" className="dash-action-grid__icon dash-action-grid__icon--yellow" />
+            <span>{t("utilities.title", "Utilità")}</span>
+          </button>
+          <button type="button" className="dash-action-grid__item" onClick={onOpenReminders}>
+            <ActionGridIcon name="bell" className="dash-action-grid__icon dash-action-grid__icon--red" />
+            <span>{t("dashboardGarage.reminders", "Promemoria")}</span>
+          </button>
+        </section>
+      )}
     </div>
   );
 }

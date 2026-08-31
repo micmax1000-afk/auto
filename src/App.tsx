@@ -588,7 +588,6 @@ export default function App() {
           <UtilitiesScreen
             onClose={() => setShowUtilities(false)}
             onOpenReminders={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "scadenze" }); }}
-            onOpenDocuments={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "manutenzioni" }); }}
             onOpenExpenses={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "spese" }); }}
             onOpenTireCalc={() => setShowTireCalc(true)}
             onOpenCommute={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "tragitto" }); }}

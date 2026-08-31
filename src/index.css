@@ -1891,7 +1891,19 @@ textarea {
 .dashboard {
   padding-bottom: 5.5rem;
   min-height: 100vh;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(10, 12, 15, 0.78), rgba(10, 12, 15, 0.78)),
+    url("/images/app-background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+:root[data-theme="light"] .dashboard {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+    url("/images/app-background.jpg");
 }
 
 /* Header */
@@ -3721,6 +3733,11 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.fc-item__icon svg {
+  width: 19px;
+  height: 19px;
 }
 
 .fc-item__icon--fuel {
