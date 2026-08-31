@@ -286,8 +286,8 @@ export default function VehicleDetail({
             <div className="section-head section-head--tight">
               <div><h2>Rifornimento</h2><p className="section-subtitle">Carburante e ricarica elettrica</p></div>
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                <button type="button" className="btn btn--primary" onClick={() => setShowFuelForm(true)}>⛽ Rifornimento</button>
-                <button type="button" className="btn btn--ghost" onClick={() => setShowChargingForm(true)}>⚡ Ricarica</button>
+                <button type="button" className="btn btn--primary btn--icon" onClick={() => setShowFuelForm(true)}><ActionGridIcon name="fuel" /> Rifornimento</button>
+                <button type="button" className="btn btn--ghost btn--icon" onClick={() => setShowChargingForm(true)}><ActionGridIcon name="bolt" /> Ricarica</button>
               </div>
             </div>
             <FuelChargeList
@@ -308,11 +308,17 @@ export default function VehicleDetail({
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
                   type="button"
-                  className="btn btn--ghost btn--small"
+                  className="btn btn--ghost btn--small btn--icon"
                   onClick={handleGeneratePassport}
                   disabled={generatingPassport}
                 >
-                  {generatingPassport ? t("passport.generating") : `📄 ${t("passport.generate")}`}
+                  {generatingPassport ? (
+                    t("passport.generating")
+                  ) : (
+                    <>
+                      <ActionGridIcon name="folder" /> {t("passport.generate")}
+                    </>
+                  )}
                   {!isPro && " 🔒"}
                 </button>
                 <button type="button" className="btn btn--primary" onClick={() => setShowMaintenanceForm(true)}>

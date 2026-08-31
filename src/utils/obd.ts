@@ -113,6 +113,15 @@ export class ObdConnection {
   private buffer = "";
   private pendingResolve: ((value: string) => void) | null = null;
 
+  // Trasporto USB seriale (ELM327 via cavo, adattatori CH340/FTDI/USB-OBD):
+  // stesso protocollo ELM327 del Bluetooth, cambia solo il canale di
+  // invio/ricezione byte, quindi tutta la logica dei comandi sopra resta
+  // condivisa tra i due trasporti.
+  private transport: "ble" | "serial" = "ble";
+  private serialPort: SerialPort | null = null;
+  private serialWriter: WritableStreamDefaultWriter<Uint8Array> | null = null;
+  private serialReadLoopActive = false;
+
   public status: ObdStatus = "disconnected";
   public onStatusChange?: (status: ObdStatus) => void;
   public onDisconnected?: () => void;
@@ -126,6 +135,11 @@ export class ObdConnection {
 
   static isSupported(): boolean {
     return typeof navigator !== "undefined" && "bluetooth" in navigator;
+  }
+
+  /** Web Serial (USB): supportato da Chrome/Edge desktop e da Chrome su Android con cavo USB-OTG. */
+  static isSerialSupported(): boolean {
+    return typeof navigator !== "undefined" && "serial" in navigator;
   }
 
   /** Alcuni browser Chromium espongono navigator.bluetooth.getDevices() per i device già autorizzati. */
@@ -150,9 +164,10 @@ export class ObdConnection {
 
   async connect(protocol?: string): Promise<void> {
     if (!ObdConnection.isSupported()) {
-      throw new Error("Questo browser non supporta Web Bluetooth. Usa Chrome o Edge su Android.");
+      throw new Error("Questo browser non supporta Web Bluetooth. Usa Chrome o Edge su Android, oppure collega l'adattatore via USB.");
     }
 
+    this.transport = "ble";
     this.setStatus("connecting");
 
     const allServiceUuids = KNOWN_PROFILES.map((p) => p.serviceUuid);
@@ -163,6 +178,67 @@ export class ObdConnection {
     });
 
     await this.connectToDevice(device, protocol);
+  }
+
+  /**
+   * Connessione via USB seriale (Web Serial API) — copre gli adattatori
+   * ELM327 via cavo e i cloni con chip CH340/FTDI, che il Bluetooth non
+   * può raggiungere. Stesso protocollo ELM327 del ramo Bluetooth.
+   */
+  async connectSerial(protocol?: string): Promise<void> {
+    if (!ObdConnection.isSerialSupported()) {
+      throw new Error("Questo browser non supporta il collegamento USB (Web Serial). Usa Chrome o Edge su desktop o Android.");
+    }
+
+    this.transport = "serial";
+    this.setStatus("connecting");
+
+    const port = await navigator.serial.requestPort();
+    // 38400 baud è il default della quasi totalità dei cloni ELM327 v1.5;
+    // alcuni adattatori più vecchi usano 9600 o 115200, ma partiamo dal
+    // valore più diffuso per massimizzare le connessioni riuscite al primo colpo.
+    await port.open({ baudRate: 38400 });
+    this.serialPort = port;
+    this.lastDeviceId = null;
+    this.lastDeviceName = "USB";
+
+    this.startSerialReadLoop();
+
+    this.setStatus("initializing");
+    await this.initializeElm327(protocol);
+    this.setStatus("connected");
+  }
+
+  private async startSerialReadLoop(): Promise<void> {
+    if (!this.serialPort?.readable) return;
+    this.serialReadLoopActive = true;
+    const writer = this.serialPort.writable?.getWriter();
+    this.serialWriter = writer ?? null;
+
+    const reader = this.serialPort.readable.getReader();
+    const decoder = new TextDecoder();
+
+    (async () => {
+      try {
+        while (this.serialReadLoopActive) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (value) {
+            this.buffer += decoder.decode(value, { stream: true });
+            if (this.buffer.includes(">")) {
+              const response = this.buffer;
+              this.buffer = "";
+              this.pendingResolve?.(response);
+              this.pendingResolve = null;
+            }
+          }
+        }
+      } catch {
+        // porta chiusa o disconnessa: gestito da disconnect()/onDisconnected
+      } finally {
+        reader.releaseLock();
+      }
+    })();
   }
 
   private async connectToDevice(device: BluetoothDevice, protocol?: string): Promise<void> {
@@ -228,7 +304,8 @@ export class ObdConnection {
   }
 
   private async sendRaw(command: string, timeoutMs = 4000): Promise<string> {
-    if (!this.writeChar) throw new Error("Non connesso.");
+    if (this.transport === "ble" && !this.writeChar) throw new Error("Non connesso.");
+    if (this.transport === "serial" && !this.serialWriter) throw new Error("Non connesso.");
 
     const responsePromise = new Promise<string>((resolve, reject) => {
       this.pendingResolve = resolve;
@@ -241,7 +318,11 @@ export class ObdConnection {
     });
 
     const payload = new TextEncoder().encode(command + "\r");
-    await this.writeChar.writeValue(payload);
+    if (this.transport === "ble") {
+      await this.writeChar!.writeValue(payload);
+    } else {
+      await this.serialWriter!.write(payload);
+    }
 
     return responsePromise;
   }
@@ -457,11 +538,23 @@ export class ObdConnection {
   }
 
   async disconnect(): Promise<void> {
-    this.notifyChar?.removeEventListener("characteristicvaluechanged", this.handleNotification);
-    this.device?.gatt?.disconnect();
-    this.device = null;
-    this.writeChar = null;
-    this.notifyChar = null;
+    this.serialReadLoopActive = false;
+    if (this.transport === "ble") {
+      this.notifyChar?.removeEventListener("characteristicvaluechanged", this.handleNotification);
+      this.device?.gatt?.disconnect();
+      this.device = null;
+      this.writeChar = null;
+      this.notifyChar = null;
+    } else {
+      try {
+        this.serialWriter?.releaseLock();
+        await this.serialPort?.close();
+      } catch {
+        // porta già chiusa/disconnessa fisicamente, nulla da fare
+      }
+      this.serialWriter = null;
+      this.serialPort = null;
+    }
     this.setStatus("disconnected");
   }
 }

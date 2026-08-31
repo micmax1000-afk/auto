@@ -2484,12 +2484,12 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: transparent;
-  border: 1.5px solid var(--chrome-border);
+  background: var(--card);
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   cursor: pointer;
-  color: var(--paper);
+  color: var(--text);
   text-align: left;
   transition: border-color 0.15s ease;
 }
@@ -2505,7 +2505,7 @@ textarea {
 .vehicle-picker__km {
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  color: var(--paper-dim, #8a93a1);
+  color: var(--text-muted);
 }
 
 .category-picker {
@@ -4096,4 +4096,17 @@ textarea {
   padding: 0.6rem 0.7rem;
   color: var(--text);
   font-size: 0.85rem;
+}
+
+/* Icona + testo nei bottoni (rifornimento/ricarica rapidi dentro la lista) */
+.btn--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn--icon svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
