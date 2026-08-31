@@ -8,7 +8,7 @@ interface Props {
   entries: MaintenanceEntry[];
   reminders: Reminder[];
   currentKm: number;
-  onOpenReminders: () => void;
+  onOpenReminders?: () => void;
 }
 
 export default function MaintenanceOverview({ entries, reminders, currentKm, onOpenReminders }: Props) {
@@ -39,9 +39,11 @@ export default function MaintenanceOverview({ entries, reminders, currentKm, onO
           <span className="eyebrow">{t("maintenance.overviewEyebrow", "CONTROLLO VEICOLO")}</span>
           <h3>{t("maintenance.overviewTitle", "Stato manutenzione")}</h3>
         </div>
-        <button type="button" className="btn btn--ghost btn--small" onClick={onOpenReminders}>
-          {t("maintenance.overviewReminders", "Vedi scadenze")}
-        </button>
+        {onOpenReminders && (
+          <button type="button" className="btn btn--ghost btn--small" onClick={onOpenReminders}>
+            {t("maintenance.overviewReminders", "Vedi scadenze")}
+          </button>
+        )}
       </div>
 
       <div className="maintenance-overview__grid">

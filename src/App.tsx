@@ -46,20 +46,20 @@ import { getMeta, setMeta } from "./utils/db";
 import QuickFuelForm from "./components/QuickFuelForm";
 import QuickChargeForm from "./components/QuickChargeForm";
 import KmHistory from "./components/KmHistory";
-import ActionGridIcon from "./components/ActionGridIcon";
 import { useProStatus, FREE_VEHICLE_LIMIT } from "./services/billing/useProStatus";
 
 // Mappa il tab della bottom bar alla scheda di dettaglio veicolo da aprire
-type DetailTabTarget = "live" | "rifornimenti" | "manutenzioni" | "scadenze" | "riepilogo";
+type DetailTabTarget = "live" | "rifornimenti" | "manutenzioni" | "scadenze" | "tragitto" | "riepilogo";
 
 type PendingAction =
   | { kind: "navigate"; tab: DetailTabTarget }
   | { kind: "quickFuel" }
   | { kind: "quickCharge" };
 
-const MAIN_TAB_TO_DETAIL_TAB: Record<"manutenzione" | "statistiche", DetailTabTarget> = {
+const MAIN_TAB_TO_DETAIL_TAB: Record<"manutenzione" | "statistiche" | "movimenti", DetailTabTarget> = {
   manutenzione: "manutenzioni",
   statistiche: "riepilogo",
+  movimenti: "rifornimenti",
 };
 
 export default function App() {
@@ -404,7 +404,7 @@ export default function App() {
     }
     if (tab === "movimenti") {
       setMainTab("movimenti");
-      setOpenVehicleId(null);
+      requestVehicleAction({ kind: "navigate", tab: MAIN_TAB_TO_DETAIL_TAB.movimenti });
       return;
     }
     if (tab === "manutenzione" || tab === "statistiche") {
@@ -591,28 +591,19 @@ export default function App() {
           </section>
         )}
 
-        {!showBackup && !showManageVehicles && !openVehicle && mainTab === "movimenti" && (
-          <section className="quick-hub">
-            <div className="section-head"><div><h1>Rifornimento</h1><p className="section-subtitle">Carburante e ricarica elettrica in un'unica sezione</p></div></div>
-            <div className="quick-hub__grid">
-              <button type="button" className="quick-hub__card quick-hub__card--primary" onClick={() => requestVehicleAction({ kind: "quickFuel" })}><ActionGridIcon name="fuel" className="quick-hub__icon" /><strong>Rifornimento rapido</strong><span>Inserisci prezzo/litro e costo totale</span></button>
-              <button type="button" className="quick-hub__card" onClick={() => requestVehicleAction({ kind: "quickCharge" })}><ActionGridIcon name="bolt" className="quick-hub__icon" /><strong>Ricarica elettrica</strong><span>Inserisci €/kWh e costo totale</span></button>
-            </div>
-            <div className="quick-hub__hint">I km vengono presi automaticamente dal contachilometri del veicolo.</div>
-          </section>
-        )}
-
         {!showBackup && !showManageVehicles && !openVehicle && mainTab === "impostazioni" && (
           <SettingsScreen
             onClose={() => setMainTab("garage")}
             onOpenBackup={() => setShowBackup(true)}
             onOpenTireCalc={() => setShowTireCalc(true)}
+            onOpenReminders={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
+            onOpenCommute={() => requestVehicleAction({ kind: "navigate", tab: "tragitto" })}
             theme={theme}
             onToggleTheme={handleToggleTheme}
           />
         )}
 
-        {!showBackup && !showManageVehicles && !openVehicle && mainTab !== "movimenti" && mainTab !== "impostazioni" && (
+        {!showBackup && !showManageVehicles && !openVehicle && mainTab !== "impostazioni" && (
           <Dashboard
             vehicles={vehicles}
             reminders={reminders}
@@ -653,6 +644,7 @@ export default function App() {
             expenseEntries={expenseEntries.filter((e) => e.vehicleId === openVehicle.id)}
             reminders={reminders.filter((r) => r.vehicleId === openVehicle.id)}
             initialTab={detailInitialTab}
+            restrictToTab={detailInitialTab}
             onBack={handleBackFromDetail}
             onSaveFuel={handleSaveFuel}
             onDeleteFuel={handleDeleteFuel}

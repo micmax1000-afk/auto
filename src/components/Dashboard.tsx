@@ -7,7 +7,6 @@ import { useAppSettings } from "../contexts/AppSettingsContext";
 import { FREE_VEHICLE_LIMIT } from "../services/billing/useProStatus";
 import VehicleDashboardCluster from "./VehicleDashboardCluster";
 import VehicleGaugeCluster from "./VehicleGaugeCluster";
-import TopAppBar from "./TopAppBar";
 import UpcomingReminders from "./UpcomingReminders";
 import ActionGridIcon from "./ActionGridIcon";
 
@@ -81,15 +80,6 @@ function getMaintenanceStatus(
   return { label: t("dashboardGarage.maintenanceOk"), ok: true };
 }
 
-function urgentTotal(vehicles: Vehicle[], reminders: Reminder[]) {
-  const ids = new Set(vehicles.map(v => v.id));
-  const reminderCount = reminders.filter(r => ids.has(r.vehicleId) && !r.completed).filter(r => {
-    const v = vehicles.find(x => x.id === r.vehicleId);
-    return v ? isReminderDue(r.dueDate, r.dueKm, v.currentKm) !== "ok" : false;
-  }).length;
-  return reminderCount;
-}
-
 export default function Dashboard({
   vehicles,
   reminders,
@@ -101,7 +91,6 @@ export default function Dashboard({
   onManageVehicles,
   onQuickFuel,
   onQuickKm,
-  onOpenMenu,
   onOpenReminder,
   onOpenReminders,
   onOpenMaintenance,
@@ -114,7 +103,6 @@ export default function Dashboard({
   const locale = getNumberLocale(i18n.language);
   const activeVehicles = vehicles.filter((v) => !v.archived);
   const primaryVehicle = activeVehicles[0];
-  const urgentCount = urgentTotal(activeVehicles, reminders);
 
   const primaryConsumption = primaryVehicle
     ? averageConsumption(calculateConsumption(fuelEntries.filter((f) => f.vehicleId === primaryVehicle.id)))
@@ -122,13 +110,6 @@ export default function Dashboard({
 
   return (
     <div className="dashboard">
-      <TopAppBar
-        title={t("appName", "Diario Auto")}
-        urgentCount={urgentCount}
-        onOpenMenu={onOpenMenu}
-        onOpenNotifications={onOpenReminders}
-      />
-
       {primaryVehicle && (
         <section className="dash-featured-vehicle" onClick={() => onOpenVehicle(primaryVehicle.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onOpenVehicle(primaryVehicle.id)}>
           <div className="dash-featured-vehicle__photo">

@@ -2281,15 +2281,15 @@ textarea {
 }
 
 .bottom-tabbar__item svg {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   stroke-width: 2;
 }
 
 @media (max-width: 380px) {
   .bottom-tabbar__item svg {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -4030,4 +4030,26 @@ textarea {
 .settings-embedded .quick-entry-page__header {
   position: sticky;
   top: 0;
+}
+
+/* Filtro categoria per la vista Manutenzione a schermo singolo */
+.maintenance-category-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.8rem 0;
+}
+
+.maintenance-category-filter label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.maintenance-category-filter select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.7rem;
+  color: var(--text);
+  font-size: 0.85rem;
 }

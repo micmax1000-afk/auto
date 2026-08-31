@@ -11,6 +11,8 @@ interface Props {
   onClose: () => void;
   onOpenBackup: () => void;
   onOpenTireCalc: () => void;
+  onOpenReminders: () => void;
+  onOpenCommute: () => void;
   theme: Theme;
   onToggleTheme: () => void;
 }
@@ -22,11 +24,13 @@ const ROW_ICONS: Record<string, string> = {
   units: "M4 7h16M4 12h16M4 17h10",
   theme: "M12 3a9 9 0 1 0 9 9c0-.5-.05-1-.14-1.45A5.5 5.5 0 0 1 12 3z",
   tire: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 3.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm5.5 5.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-8-1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm2.5 4.5a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM12 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4z",
+  calendar: "M7 3v3M17 3v3M4 8h16M5 6h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z",
+  route: "M4 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm16-16a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM6 18C6 12 10 12 12 9s4-3 4-3M8 20h8a2 2 0 0 0 2-2v-1",
   backup: "M12 4a5 5 0 0 0-4.9 4.02A4 4 0 0 0 6 16h11a4 4 0 0 0 1-7.87A5 5 0 0 0 12 4z",
   info: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 6v.01M11 11h1.5v6H11",
 };
 
-export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, theme, onToggleTheme }: Props) {
+export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, onOpenReminders, onOpenCommute, theme, onToggleTheme }: Props) {
   const { t, i18n } = useTranslation();
   const { currency, setCurrency, distanceUnit, setDistanceUnit, temperatureUnit, setTemperatureUnit } = useAppSettings();
   const [openRow, setOpenRow] = useState<RowId>(null);
@@ -119,6 +123,20 @@ export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, 
             <button type="button" className={`settings-chip ${theme === "light" ? "is-active" : ""}`} onClick={() => theme !== "light" && onToggleTheme()}>{t("settingsScreen.themeLight")}</button>
           </div>
         )}
+
+        {/* Scadenze */}
+        <div className="settings-row" onClick={onOpenReminders} role="button" tabIndex={0}>
+          <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.calendar} /></svg></span>
+          <span className="settings-row__label">{t("dashboardGarage.deadlines", "Scadenze")}</span>
+          <span className="settings-row__chevron">›</span>
+        </div>
+
+        {/* Tragitto */}
+        <div className="settings-row" onClick={onOpenCommute} role="button" tabIndex={0}>
+          <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.route} /></svg></span>
+          <span className="settings-row__label">{t("detail.tabs.commute", "Tragitto")}</span>
+          <span className="settings-row__chevron">›</span>
+        </div>
 
         {/* Backup */}
         <div className="settings-row" onClick={() => { onClose(); onOpenBackup(); }} role="button" tabIndex={0}>

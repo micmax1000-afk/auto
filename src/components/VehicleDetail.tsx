@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Vehicle, FuelEntry, ChargingEntry, MaintenanceEntry, ExpenseEntry, Reminder } from "../types";
+import type { Vehicle, FuelEntry, ChargingEntry, MaintenanceEntry, MaintenanceCategory, ExpenseEntry, Reminder } from "../types";
 import { calculateVehicleCosts, isReminderDue } from "../utils/calculations";
 import { getNumberLocale } from "../utils/locale";
 import { formatDistance } from "../utils/settings";
@@ -59,6 +59,7 @@ interface Props {
   onAddReminder: (reminder: Reminder) => void;
   onToggleReminder: (id: string) => void;
   onDeleteReminder: (id: string) => void;
+  restrictToTab?: DetailTab;
 }
 
 const TAB_IDS: DetailTab[] = ["live", "rifornimenti", "manutenzioni", "scadenze", "tragitto", "riepilogo"];
@@ -91,13 +92,23 @@ export default function VehicleDetail({
   onAddReminder,
   onToggleReminder,
   onDeleteReminder,
+  restrictToTab,
 }: Props) {
   const { t, i18n } = useTranslation();
   const { formatMoney, distanceUnit } = useAppSettings();
   const { isPro } = useProStatus();
   const [showPassportPremium, setShowPassportPremium] = useState(false);
   const [generatingPassport, setGeneratingPassport] = useState(false);
-  const [tab, setTab] = useState<DetailTab>(initialTab ?? "live");
+  const [tab, setTab] = useState<DetailTab>(restrictToTab ?? initialTab ?? "live");
+  const [maintenanceCategoryFilter, setMaintenanceCategoryFilter] = useState<MaintenanceCategory | "all">("all");
+
+  // In modalità "vista singola" (raggiunta dalla barra inferiore o dal
+  // click sul veicolo) il tab resta bloccato: nessuna navigazione interna
+  // può cambiarlo, anche se qualche azione prova a farlo.
+  function changeTab(next: DetailTab) {
+    if (restrictToTab) return;
+    setTab(next);
+  }
   const [showFuelForm, setShowFuelForm] = useState(false);
   const [editingFuel, setEditingFuel] = useState<FuelEntry | null>(null);
   const [showChargingForm, setShowChargingForm] = useState(false);
@@ -239,21 +250,23 @@ export default function VehicleDetail({
         <span className="detail-km">{formatDistance(vehicle.currentKm, distanceUnit, getNumberLocale(i18n.language))}</span>
       </div>
 
-      <nav className="subtabbar">
-        {TAB_IDS.map((tabId) => (
-          <button
-            key={tabId}
-            type="button"
-            className={`subtabbar__item ${tab === tabId ? "is-active" : ""}`}
-            onClick={() => setTab(tabId)}
-          >
-            {t(TAB_I18N_KEYS[tabId])}
-            {tabId === "scadenze" && activeRemindersCount > 0 && (
-              <span className="subtabbar__badge">{activeRemindersCount}</span>
-            )}
-          </button>
-        ))}
-      </nav>
+      {!restrictToTab && (
+        <nav className="subtabbar">
+          {TAB_IDS.map((tabId) => (
+            <button
+              key={tabId}
+              type="button"
+              className={`subtabbar__item ${tab === tabId ? "is-active" : ""}`}
+              onClick={() => setTab(tabId)}
+            >
+              {t(TAB_I18N_KEYS[tabId])}
+              {tabId === "scadenze" && activeRemindersCount > 0 && (
+                <span className="subtabbar__badge">{activeRemindersCount}</span>
+              )}
+            </button>
+          ))}
+        </nav>
+      )}
 
       <div className="detail-content" key={tab}>
         {tab === "live" && (
@@ -308,9 +321,31 @@ export default function VehicleDetail({
               entries={maintenanceEntries}
               reminders={reminders}
               currentKm={vehicle.currentKm}
-              onOpenReminders={() => setTab("scadenze")}
+              onOpenReminders={restrictToTab ? undefined : () => changeTab("scadenze")}
             />
-            <MaintenanceList entries={maintenanceEntries} onDelete={onDeleteMaintenance} />
+            {restrictToTab === "manutenzioni" && (
+              <div className="maintenance-category-filter">
+                <label htmlFor="maintenance-category-select">{t("maintenance.filterByCategory", "Filtra per categoria")}</label>
+                <select
+                  id="maintenance-category-select"
+                  value={maintenanceCategoryFilter}
+                  onChange={(e) => setMaintenanceCategoryFilter(e.target.value as MaintenanceCategory | "all")}
+                >
+                  <option value="all">{t("maintenance.allCategories", "Tutte le categorie")}</option>
+                  {(["tagliando", "gomme", "freni", "olio", "batteria", "raffreddamento", "software", "carrozzeria", "revisione", "altro"] as MaintenanceCategory[]).map((cat) => (
+                    <option key={cat} value={cat}>{t(`maintenanceCategory.${cat}`)}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <MaintenanceList
+              entries={
+                restrictToTab === "manutenzioni" && maintenanceCategoryFilter !== "all"
+                  ? maintenanceEntries.filter((m) => m.category === maintenanceCategoryFilter)
+                  : maintenanceEntries
+              }
+              onDelete={onDeleteMaintenance}
+            />
 
             <div className="detail-subsection detail-subsection--expenses">
               <div className="section-head section-head--tight">
