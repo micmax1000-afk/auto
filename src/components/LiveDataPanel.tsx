@@ -47,7 +47,6 @@ export default function LiveDataPanel({ vehicle }: Props) {
   const connRef = useRef<ObdConnection | null>(null);
   const [status, setStatus] = useState<ObdStatus>("disconnected");
   const [showRequirementNotice, setShowRequirementNotice] = useState(false);
-  const [pendingTransport, setPendingTransport] = useState<"ble" | "serial">("ble");
   const [reading, setReading] = useState<LiveReading>({});
   const [error, setError] = useState<string | null>(null);
 
@@ -91,7 +90,6 @@ export default function LiveDataPanel({ vehicle }: Props) {
   const [sessions, setSessions] = useState<LogSession[]>([]);
 
   const supported = ObdConnection.isSupported();
-  const serialSupported = ObdConnection.isSerialSupported();
 
   // carica profilo OBD (soglie allarme) e sessioni salvate per questo veicolo
   useEffect(() => {
@@ -188,7 +186,7 @@ export default function LiveDataPanel({ vehicle }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, recording, alarms.maxRpm, alarms.maxCoolantTempC]);
 
-  async function performConnect(transport: "ble" | "serial" = "ble") {
+  async function performConnect() {
     setError(null);
     setDtcCodes(null);
     setReadiness(null);
@@ -205,11 +203,7 @@ export default function LiveDataPanel({ vehicle }: Props) {
 
     try {
       const savedProfile = await getObdProfile(vehicle.id);
-      if (transport === "serial") {
-        await conn.connectSerial(savedProfile?.protocol);
-      } else {
-        await conn.connect(savedProfile?.protocol);
-      }
+      await conn.connect(savedProfile?.protocol);
       const detectedProtocol = await conn.detectProtocol();
       await upsertObdProfile(vehicle.id, {
         lastDeviceId: conn.lastDeviceId ?? undefined,
@@ -221,12 +215,11 @@ export default function LiveDataPanel({ vehicle }: Props) {
     }
   }
 
-  async function handleConnect(transport: "ble" | "serial" = "ble") {
+  async function handleConnect() {
     const seen = await getMeta("obd:requirementNoticeSeen");
     if (seen === "true") {
-      await performConnect(transport);
+      await performConnect();
     } else {
-      setPendingTransport(transport);
       setShowRequirementNotice(true);
     }
   }
@@ -236,7 +229,7 @@ export default function LiveDataPanel({ vehicle }: Props) {
     if (dontShowAgain) {
       await setMeta("obd:requirementNoticeSeen", "true");
     }
-    await performConnect(pendingTransport);
+    await performConnect();
   }
 
   async function handleDisconnect() {
@@ -380,7 +373,7 @@ export default function LiveDataPanel({ vehicle }: Props) {
     downloadTextFile(`sessione-${session.startedAt.slice(0, 10)}-${session.id.slice(0, 6)}.csv`, csv, "text/csv");
   }
 
-  if (!supported && !serialSupported) {
+  if (!supported) {
     return (
       <div className="empty-state">
         <p className="empty-state__title">{t("live.notSupportedTitle")}</p>
@@ -403,18 +396,9 @@ export default function LiveDataPanel({ vehicle }: Props) {
           {connRef.current?.lastDeviceName ? ` · ${connRef.current.lastDeviceName}` : ""}
         </span>
         {status === "disconnected" || status === "error" ? (
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            {supported && (
-              <button type="button" className="btn btn--primary btn--small" onClick={() => handleConnect("ble")}>
-                {t("live.connect")}
-              </button>
-            )}
-            {serialSupported && (
-              <button type="button" className="btn btn--ghost btn--small" onClick={() => handleConnect("serial")}>
-                {t("live.connectUsb", "Connetti via USB")}
-              </button>
-            )}
-          </div>
+          <button type="button" className="btn btn--primary btn--small" onClick={handleConnect}>
+            {t("live.connect")}
+          </button>
         ) : (
           <button type="button" className="btn btn--ghost btn--small" onClick={handleDisconnect}>
             {t("live.disconnect")}

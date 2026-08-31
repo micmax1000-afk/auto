@@ -395,13 +395,12 @@
       "pending": "Pending",
       "permanent": "Permanenti"
     },
-    "notSupportedTitle": "Connessione OBD2 non disponibile",
-    "notSupportedBody": "Questa funzione richiede Chrome o Edge, su Android o desktop (Bluetooth o USB). Safari su iPhone non supporta né il Bluetooth né l'USB dal browser.",
-    "connect": "Collega via Bluetooth",
-    "connectUsb": "Connetti via USB",
+    "notSupportedTitle": "Web Bluetooth non disponibile",
+    "notSupportedBody": "Questa funzione richiede Chrome o Edge su Android (o desktop). Safari su iPhone non supporta la connessione Bluetooth dal browser.",
+    "connect": "Collega adattatore OBD2",
     "disconnect": "Disconnetti",
-    "connectingHint": "Segui la richiesta del browser per selezionare il tuo adattatore OBD2 (Bluetooth o USB).",
-    "disconnectedHint": "Collega un adattatore OBD2 Bluetooth Low Energy (es. Vgate iCar Pro BLE, Veepeak OBDCheck BLE) o USB (cavo ELM327) alla presa OBD2 dell'auto, accendi il quadro e premi \"Collega\".",
+    "connectingHint": "Segui la richiesta del browser per selezionare il tuo adattatore OBD2 Bluetooth.",
+    "disconnectedHint": "Collega un adattatore OBD2 Bluetooth Low Energy (es. Vgate iCar Pro BLE, Veepeak OBDCheck BLE) alla presa OBD2 dell'auto, accendi il quadro e premi \"Collega adattatore\".",
     "recording": {
       "title": "Registrazione sessione",
       "start": "● Avvia registrazione",
@@ -865,8 +864,8 @@
     "title": "Prima di connetterti",
     "continue": "Ho capito, connetti",
     "body": "Per usare la diagnostica live serve un adattatore OBD2 Bluetooth compatibile, collegato alla presa OBD2 dell'auto (di solito sotto il volante). Non incluso nell'app — se non ne hai uno, esempi economici e testati:",
-    "examplesOther": "o altri cloni ELM327 con Bluetooth Low Energy (BLE) o USB",
-    "bleOnlyHint": "Sono supportati adattatori Bluetooth Low Energy (BLE) o USB — gli adattatori con solo Bluetooth classico o WiFi non funzionano con questa app.",
+    "examplesOther": "o altri cloni ELM327 con Bluetooth Low Energy (BLE)",
+    "bleOnlyHint": "Solo Bluetooth Low Energy (BLE) è supportato — gli adattatori con solo Bluetooth classico o WiFi non funzionano con questa app.",
     "dontShowAgain": "Non mostrare più",
     "safetyWarning": "Non usare questa funzione durante la guida. Consulta i dati solo a veicolo fermo."
   }
