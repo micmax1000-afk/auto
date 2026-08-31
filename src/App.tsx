@@ -36,6 +36,7 @@ import VehicleDetail from "./components/VehicleDetail";
 import QuickKmUpdate from "./components/QuickKmUpdate";
 import BackupPanel from "./components/BackupPanel";
 import SettingsScreen from "./components/SettingsScreen";
+import UtilitiesScreen from "./components/UtilitiesScreen";
 import Dashboard from "./components/Dashboard";
 import BottomTabBar, { type TabId } from "./components/BottomTabBar";
 import PremiumScreen from "./components/PremiumScreen";
@@ -49,7 +50,7 @@ import KmHistory from "./components/KmHistory";
 import { useProStatus, FREE_VEHICLE_LIMIT } from "./services/billing/useProStatus";
 
 // Mappa il tab della bottom bar alla scheda di dettaglio veicolo da aprire
-type DetailTabTarget = "live" | "rifornimenti" | "manutenzioni" | "scadenze" | "tragitto" | "riepilogo";
+type DetailTabTarget = "live" | "rifornimenti" | "manutenzioni" | "spese" | "scadenze" | "tragitto" | "riepilogo";
 
 type PendingAction =
   | { kind: "navigate"; tab: DetailTabTarget }
@@ -77,6 +78,7 @@ export default function App() {
   const [quickFuelVehicleId, setQuickFuelVehicleId] = useState<string | null>(null);
   const [quickChargeVehicleId, setQuickChargeVehicleId] = useState<string | null>(null);
   const [showBackup, setShowBackup] = useState(false);
+  const [showUtilities, setShowUtilities] = useState(false);
   const [showManageVehicles, setShowManageVehicles] = useState(false);
   const [openVehicleId, setOpenVehicleId] = useState<string | null>(null);
   const [detailInitialTab, setDetailInitialTab] = useState<DetailTabTarget>("live");
@@ -457,24 +459,6 @@ export default function App() {
 
   return (
     <div className="app">
-      {!showBackup && !openVehicle && vehicles.filter((v) => !v.archived).length > 1 && (
-        <div className="vehicle-switcher">
-          {vehicles
-            .filter((v) => !v.archived)
-            .map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                className={`vehicle-switcher__chip ${openVehicleId === v.id ? "is-active" : ""}`}
-                onClick={() => setOpenVehicleId(v.id)}
-              >
-                {v.name}
-                {hasUrgentReminder(v.id, v.currentKm) && <span className="vehicle-switcher__dot" />}
-              </button>
-            ))}
-        </div>
-      )}
-
       <main
         className="content"
         key={`${mainTab}-${showBackup ? "backup" : "app"}-${openVehicleId ?? "list"}`}
@@ -591,19 +575,32 @@ export default function App() {
           </section>
         )}
 
-        {!showBackup && !showManageVehicles && !openVehicle && mainTab === "impostazioni" && (
+        {!showBackup && !showManageVehicles && !openVehicle && !showUtilities && mainTab === "impostazioni" && (
           <SettingsScreen
             onClose={() => setMainTab("garage")}
             onOpenBackup={() => setShowBackup(true)}
-            onOpenTireCalc={() => setShowTireCalc(true)}
-            onOpenReminders={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
-            onOpenCommute={() => requestVehicleAction({ kind: "navigate", tab: "tragitto" })}
             theme={theme}
             onToggleTheme={handleToggleTheme}
           />
         )}
 
-        {!showBackup && !showManageVehicles && !openVehicle && mainTab !== "impostazioni" && (
+        {!showBackup && !showManageVehicles && !openVehicle && showUtilities && (
+          <UtilitiesScreen
+            onClose={() => setShowUtilities(false)}
+            onOpenReminders={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "scadenze" }); }}
+            onOpenDocuments={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "manutenzioni" }); }}
+            onOpenExpenses={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "spese" }); }}
+            onOpenTireCalc={() => setShowTireCalc(true)}
+            onOpenCommute={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "tragitto" }); }}
+            onOpenKmHistory={() => {
+              setShowUtilities(false);
+              const target = vehicles.find((v) => !v.archived);
+              if (target) setKmHistoryVehicleId(target.id);
+            }}
+          />
+        )}
+
+        {!showBackup && !showManageVehicles && !openVehicle && !showUtilities && mainTab !== "impostazioni" && (
           <Dashboard
             vehicles={vehicles}
             reminders={reminders}
@@ -621,17 +618,12 @@ export default function App() {
             onQuickFuel={() => requestVehicleAction({ kind: "quickFuel" })}
             onQuickCharge={() => requestVehicleAction({ kind: "quickCharge" })}
             onQuickKm={(vehicle) => setQuickKmVehicle(vehicle)}
-            onOpenMenu={() => setMainTab("impostazioni")}
             onOpenReminder={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
             onOpenReminders={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
             onOpenMaintenance={() => requestVehicleAction({ kind: "navigate", tab: "manutenzioni" })}
             onOpenStats={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
-            onOpenDocuments={() => requestVehicleAction({ kind: "navigate", tab: "riepilogo" })}
+            onOpenUtilities={() => setShowUtilities(true)}
             onOpenPremium={() => setShowPremium(true)}
-            onOpenKmHistory={() => {
-              const target = vehicles.find((v) => !v.archived);
-              if (target) setKmHistoryVehicleId(target.id);
-            }}
           />
         )}
 

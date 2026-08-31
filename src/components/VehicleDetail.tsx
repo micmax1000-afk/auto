@@ -34,6 +34,7 @@ type DetailTab =
   | "live"
   | "rifornimenti"
   | "manutenzioni"
+  | "spese"
   | "scadenze"
   | "tragitto"
   | "riepilogo";
@@ -62,11 +63,12 @@ interface Props {
   restrictToTab?: DetailTab;
 }
 
-const TAB_IDS: DetailTab[] = ["live", "rifornimenti", "manutenzioni", "scadenze", "tragitto", "riepilogo"];
+const TAB_IDS: DetailTab[] = ["live", "rifornimenti", "manutenzioni", "spese", "scadenze", "tragitto", "riepilogo"];
 const TAB_I18N_KEYS: Record<DetailTab, string> = {
   live: "detail.tabs.live",
   rifornimenti: "detail.tabs.fuel",
   manutenzioni: "detail.tabs.maintenance",
+  spese: "expenses.title",
   scadenze: "detail.tabs.reminders",
   tragitto: "detail.tabs.commute",
   riepilogo: "detail.tabs.summary",
@@ -346,14 +348,16 @@ export default function VehicleDetail({
               }
               onDelete={onDeleteMaintenance}
             />
+          </>
+        )}
 
-            <div className="detail-subsection detail-subsection--expenses">
-              <div className="section-head section-head--tight">
-                <div><h3>{t("expenses.title")}</h3><p className="section-subtitle">Spese collegate alla gestione dell'auto</p></div>
-                <button type="button" className="btn btn--ghost" onClick={() => setShowExpenseForm(true)}>+ {t("expenses.add")}</button>
-              </div>
-              <ExpenseList entries={expenseEntries} onDelete={onDeleteExpense} />
+        {tab === "spese" && (
+          <>
+            <div className="section-head section-head--tight">
+              <div><h2>{t("expenses.title")}</h2><p className="section-subtitle">Spese collegate alla gestione dell'auto (bollo, assicurazione, ecc.)</p></div>
+              <button type="button" className="btn btn--primary" onClick={() => setShowExpenseForm(true)}>{t("expenses.add")}</button>
             </div>
+            <ExpenseList entries={expenseEntries} onDelete={onDeleteExpense} />
           </>
         )}
 

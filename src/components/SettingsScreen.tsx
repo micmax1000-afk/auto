@@ -10,9 +10,6 @@ import QuickEntryHeader from "./QuickEntryHeader";
 interface Props {
   onClose: () => void;
   onOpenBackup: () => void;
-  onOpenTireCalc: () => void;
-  onOpenReminders: () => void;
-  onOpenCommute: () => void;
   theme: Theme;
   onToggleTheme: () => void;
 }
@@ -30,7 +27,7 @@ const ROW_ICONS: Record<string, string> = {
   info: "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 6v.01M11 11h1.5v6H11",
 };
 
-export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, onOpenReminders, onOpenCommute, theme, onToggleTheme }: Props) {
+export default function SettingsScreen({ onClose, onOpenBackup, theme, onToggleTheme }: Props) {
   const { t, i18n } = useTranslation();
   const { currency, setCurrency, distanceUnit, setDistanceUnit, temperatureUnit, setTemperatureUnit } = useAppSettings();
   const [openRow, setOpenRow] = useState<RowId>(null);
@@ -103,13 +100,6 @@ export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, 
           </div>
         )}
 
-        {/* Misura ruote */}
-        <div className="settings-row" onClick={onOpenTireCalc} role="button" tabIndex={0}>
-          <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.tire} /></svg></span>
-          <span className="settings-row__label">{t("settingsScreen.tireSize")}</span>
-          <span className="settings-row__chevron">›</span>
-        </div>
-
         {/* Tema */}
         <div className="settings-row" onClick={() => toggleRow("theme")} role="button" tabIndex={0}>
           <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.theme} /></svg></span>
@@ -123,20 +113,6 @@ export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, 
             <button type="button" className={`settings-chip ${theme === "light" ? "is-active" : ""}`} onClick={() => theme !== "light" && onToggleTheme()}>{t("settingsScreen.themeLight")}</button>
           </div>
         )}
-
-        {/* Scadenze */}
-        <div className="settings-row" onClick={onOpenReminders} role="button" tabIndex={0}>
-          <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.calendar} /></svg></span>
-          <span className="settings-row__label">{t("dashboardGarage.deadlines", "Scadenze")}</span>
-          <span className="settings-row__chevron">›</span>
-        </div>
-
-        {/* Tragitto */}
-        <div className="settings-row" onClick={onOpenCommute} role="button" tabIndex={0}>
-          <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.route} /></svg></span>
-          <span className="settings-row__label">{t("detail.tabs.commute", "Tragitto")}</span>
-          <span className="settings-row__chevron">›</span>
-        </div>
 
         {/* Backup */}
         <div className="settings-row" onClick={() => { onClose(); onOpenBackup(); }} role="button" tabIndex={0}>
