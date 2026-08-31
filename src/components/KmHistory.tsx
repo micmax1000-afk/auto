@@ -54,7 +54,7 @@ export default function KmHistory({ vehicle, fuelEntries, chargingEntries, onBac
                   contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
                   formatter={(value) => [`${Number(value).toLocaleString(locale, { maximumFractionDigits: 0 })} ${distanceUnit}`, ""]}
                 />
-                <Line type="monotone" dataKey="km" stroke="#3884ff" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="km" stroke="#f5901f" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

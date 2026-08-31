@@ -5,6 +5,7 @@ import type { ChargingEntry, Vehicle } from "../types";
 import { generateId, getHomeChargingDefaults, setHomeChargingDefaults } from "../utils/storage";
 import { getNumberLocale } from "../utils/locale";
 import QuickEntryHeader from "./QuickEntryHeader";
+import ActionGridIcon from "./ActionGridIcon";
 
 interface Props {
   vehicle: Vehicle;
@@ -81,7 +82,7 @@ export default function QuickChargeForm({ vehicle, existingEntries = [], onSave,
       <form onSubmit={handleSubmit} className="quick-entry-page__body">
         <div className="quick-entry-card">
           <div className="quick-entry-card__title-row">
-            <span className="quick-entry-card__icon quick-entry-card__icon--green">⚡</span>
+            <span className="quick-entry-card__icon quick-entry-card__icon--green"><ActionGridIcon name="bolt" /></span>
             <div>
               <strong>{t("quickEntry.chargeTitleFull")}</strong>
               <p>{vehicle.name}</p>

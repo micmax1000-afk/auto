@@ -39,7 +39,7 @@ export default function SettingsScreen({ onClose, onOpenBackup, onOpenTireCalc, 
   }
 
   return (
-    <div className="quick-entry-page settings-page">
+    <div className="settings-embedded">
       <QuickEntryHeader title={t("settingsScreen.title")} onBack={onClose} tone="blue" />
 
       <div className="settings-list">

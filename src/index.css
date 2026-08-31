@@ -5,6 +5,8 @@
   --asphalt-light: #171c22;
   --chrome-border: #2a323c;
   --chrome-text-muted: #6b7684;
+  --chrome-bg: var(--asphalt);
+  --chrome-text: var(--paper);
 
   /* Accenti: costanti in entrambi i temi */
   --paper: #f3f1ea;
@@ -30,12 +32,14 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #f2ecdd;
+  --bg: #ffffff;
   --card: #ffffff;
-  --surface-alt: #ece4d0;
-  --border: #ddd3ba;
-  --text: #2b2620;
-  --text-muted: #756e5f;
+  --surface-alt: #f2f2f2;
+  --border: #e2e2e2;
+  --text: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --chrome-bg: #ffffff;
+  --chrome-text: #1a1a1a;
 
   color-scheme: light;
 }
@@ -481,7 +485,7 @@ textarea {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  z-index: 50;
+  z-index: 300;
 }
 
 .modal {
@@ -682,7 +686,8 @@ textarea {
 
 .detail-km {
   font-family: var(--font-mono);
-  background: var(--asphalt);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
   color: var(--amber);
   padding: 0.4rem 0.85rem;
   border-radius: 20px;
@@ -1895,7 +1900,8 @@ textarea {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem 0.85rem;
-  background: var(--asphalt);
+  background: var(--chrome-bg);
+  border-bottom: 1px solid var(--chrome-border);
   position: sticky;
   top: 0;
   z-index: 30;
@@ -1936,7 +1942,7 @@ textarea {
 }
 
 .dash-icon-btn:hover {
-  color: var(--paper);
+  color: var(--chrome-text);
 }
 
 .dash-avatar {
@@ -2246,7 +2252,7 @@ textarea {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--asphalt);
+  background: var(--chrome-bg);
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-around;
@@ -2580,6 +2586,10 @@ textarea {
   background: radial-gradient(ellipse at center, #14181d 0%, #0a0c0f 100%);
 }
 
+:root[data-theme="light"] .dash-cluster {
+  background: radial-gradient(ellipse at center, #f5f5f5 0%, #e6e6e6 100%);
+}
+
 .dash-cluster__light {
   display: flex;
   align-items: center;
@@ -2595,6 +2605,10 @@ textarea {
 
 .dash-cluster__light--off {
   color: #2a323c;
+}
+
+:root[data-theme="light"] .dash-cluster__light--off {
+  color: #c4c4c4;
 }
 
 .dash-cluster__light--amber {
@@ -2619,6 +2633,10 @@ textarea {
 
 .dash-cluster--all-clear {
   background: radial-gradient(ellipse at center, #10231a 0%, #0a0c0f 100%);
+}
+
+:root[data-theme="light"] .dash-cluster--all-clear {
+  background: radial-gradient(ellipse at center, #eaf5ee 0%, #e6e6e6 100%);
 }
 
 .onboarding {
@@ -2807,9 +2825,9 @@ textarea {
 
 .quick-hub__card,
 .quick-hub__menu-item {
-  border: 1px solid var(--chrome-border);
-  background: var(--surface, var(--asphalt));
-  color: var(--chrome-text);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
   border-radius: 12px;
   cursor: pointer;
   transition: transform .15s ease, border-color .15s ease;
@@ -2817,9 +2835,9 @@ textarea {
 
 .quick-hub__card { min-height: 130px; padding: 1rem; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: .35rem; }
 .quick-hub__card:hover, .quick-hub__menu-item:hover { transform: translateY(-1px); border-color: var(--amber); }
-.quick-hub__card strong, .quick-hub__menu-item strong { color: var(--chrome-text); }
-.quick-hub__card span:last-child { color: var(--chrome-text-muted); font-size: .78rem; }
-.quick-hub__icon { font-size: 1.8rem; }
+.quick-hub__card strong, .quick-hub__menu-item strong { color: var(--text); }
+.quick-hub__card span:last-child { color: var(--text-muted); font-size: .78rem; }
+.quick-hub__icon { width: 28px; height: 28px; color: var(--ok); }
 .quick-hub__menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
 .quick-hub__menu-item { min-height: 62px; padding: .85rem 1rem; display: flex; align-items: center; gap: .75rem; text-align: left; }
 .quick-hub__menu-item span { font-size: 1.25rem; }
@@ -2996,7 +3014,11 @@ textarea {
 .dash-featured-vehicle__photo {
   position: relative;
   height: 130px;
-  background: radial-gradient(circle at 30% 20%, var(--surface-alt), var(--asphalt));
+  background-image:
+    linear-gradient(180deg, rgba(10, 12, 15, 0.15) 0%, rgba(10, 12, 15, 0.55) 100%),
+    url("/images/garage-hero.jpg");
+  background-size: cover;
+  background-position: center 30%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3017,8 +3039,8 @@ textarea {
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #fff;
-  background: #3884ff;
+  color: var(--asphalt);
+  background: var(--amber);
   border-radius: 6px;
   padding: 0.15rem 0.5rem;
 }
@@ -3110,10 +3132,10 @@ textarea {
 }
 
 .gauge-cluster__glow {
-  stroke: var(--cyan);
+  stroke: var(--amber);
   stroke-width: 3;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 4px var(--cyan));
+  filter: drop-shadow(0 0 4px var(--amber));
   opacity: 0.85;
 }
 
@@ -3313,8 +3335,15 @@ textarea {
 }
 
 .dash-action-grid__icon {
-  font-size: 1.25rem;
+  width: 26px;
+  height: 26px;
 }
+
+.dash-action-grid__icon--green { color: var(--ok); }
+.dash-action-grid__icon--orange { color: var(--amber); }
+.dash-action-grid__icon--blue { color: #3884ff; }
+.dash-action-grid__icon--yellow { color: #e8c73e; }
+.dash-action-grid__icon--red { color: var(--danger); }
 
 .dash-action-grid__item--highlight {
   border-color: var(--ok);
@@ -3356,7 +3385,7 @@ textarea {
   align-items: center;
   gap: 0.8rem;
   padding: 1rem 1.1rem;
-  background: var(--asphalt);
+  background: var(--chrome-bg);
   border-bottom: 1px solid var(--chrome-border);
 }
 
@@ -3368,7 +3397,7 @@ textarea {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--paper);
+  color: var(--chrome-text);
   margin: 0;
 }
 
@@ -3379,7 +3408,7 @@ textarea {
 .quick-entry-page__back {
   background: none;
   border: none;
-  color: var(--paper);
+  color: var(--chrome-text);
   cursor: pointer;
   display: flex;
   padding: 0.2rem;
@@ -3387,7 +3416,7 @@ textarea {
 
 .quick-entry-page__header--blue .quick-entry-page__back,
 .quick-entry-page__header--blue h1 {
-  color: var(--paper);
+  color: var(--chrome-text);
 }
 
 .quick-entry-page__body {
@@ -3426,13 +3455,13 @@ textarea {
 }
 
 .quick-entry-card__icon--blue {
-  background: rgba(56, 132, 255, 0.15);
-  color: #3884ff;
+  background: rgba(245, 144, 31, 0.15);
+  color: var(--amber);
 }
 
 .quick-entry-card__icon--green {
-  background: rgba(63, 187, 114, 0.15);
-  color: var(--ok);
+  background: rgba(245, 144, 31, 0.15);
+  color: var(--amber);
 }
 
 .quick-entry-card__title-row strong {
@@ -3463,11 +3492,11 @@ textarea {
 .quick-entry-card__km strong {
   font-family: var(--font-mono);
   font-size: 1.1rem;
-  color: #3884ff;
+  color: var(--amber);
 }
 
 .quick-entry-page--green .quick-entry-card__km strong {
-  color: var(--ok);
+  color: var(--amber);
 }
 
 .quick-entry-page__section-label {
@@ -3691,13 +3720,13 @@ textarea {
 }
 
 .fc-item__icon--fuel {
-  background: rgba(56, 132, 255, 0.15);
-  color: #3884ff;
+  background: rgba(245, 144, 31, 0.15);
+  color: var(--amber);
 }
 
 .fc-item__icon--charge {
-  background: rgba(63, 187, 114, 0.15);
-  color: var(--ok);
+  background: rgba(245, 144, 31, 0.15);
+  color: var(--amber);
 }
 
 .fc-item__body {
@@ -3728,13 +3757,13 @@ textarea {
 }
 
 .fc-item__badge--fuel {
-  background: rgba(56, 132, 255, 0.15);
-  color: #3884ff;
+  background: rgba(245, 144, 31, 0.15);
+  color: var(--amber);
 }
 
 .fc-item__badge--charge {
-  background: rgba(63, 187, 114, 0.15);
-  color: var(--ok);
+  background: rgba(245, 144, 31, 0.15);
+  color: var(--amber);
 }
 
 .fc-item__mid {
@@ -3988,4 +4017,17 @@ textarea {
   color: var(--amber);
   font-weight: 700;
   cursor: pointer;
+}
+
+/* Impostazioni incorporate nel flusso principale (non più overlay fixed),
+   cosi la bottom-tabbar resta sempre visibile e fissa come le altre schede */
+.settings-embedded {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 5.5rem;
+}
+
+.settings-embedded .quick-entry-page__header {
+  position: sticky;
+  top: 0;
 }

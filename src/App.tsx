@@ -46,6 +46,7 @@ import { getMeta, setMeta } from "./utils/db";
 import QuickFuelForm from "./components/QuickFuelForm";
 import QuickChargeForm from "./components/QuickChargeForm";
 import KmHistory from "./components/KmHistory";
+import ActionGridIcon from "./components/ActionGridIcon";
 import { useProStatus, FREE_VEHICLE_LIMIT } from "./services/billing/useProStatus";
 
 // Mappa il tab della bottom bar alla scheda di dettaglio veicolo da aprire
@@ -76,7 +77,6 @@ export default function App() {
   const [quickFuelVehicleId, setQuickFuelVehicleId] = useState<string | null>(null);
   const [quickChargeVehicleId, setQuickChargeVehicleId] = useState<string | null>(null);
   const [showBackup, setShowBackup] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [showManageVehicles, setShowManageVehicles] = useState(false);
   const [openVehicleId, setOpenVehicleId] = useState<string | null>(null);
   const [detailInitialTab, setDetailInitialTab] = useState<DetailTabTarget>("live");
@@ -415,7 +415,6 @@ export default function App() {
     if (tab === "impostazioni") {
       setMainTab("impostazioni");
       setOpenVehicleId(null);
-      setShowSettings(true);
       return;
     }
     setMainTab("garage");
@@ -596,11 +595,21 @@ export default function App() {
           <section className="quick-hub">
             <div className="section-head"><div><h1>Rifornimento</h1><p className="section-subtitle">Carburante e ricarica elettrica in un'unica sezione</p></div></div>
             <div className="quick-hub__grid">
-              <button type="button" className="quick-hub__card quick-hub__card--primary" onClick={() => requestVehicleAction({ kind: "quickFuel" })}><span className="quick-hub__icon quick-hub__icon--blue">⛽</span><strong>Rifornimento rapido</strong><span>Inserisci prezzo/litro e costo totale</span></button>
-              <button type="button" className="quick-hub__card" onClick={() => requestVehicleAction({ kind: "quickCharge" })}><span className="quick-hub__icon quick-hub__icon--blue">⚡</span><strong>Ricarica elettrica</strong><span>Inserisci €/kWh e costo totale</span></button>
+              <button type="button" className="quick-hub__card quick-hub__card--primary" onClick={() => requestVehicleAction({ kind: "quickFuel" })}><ActionGridIcon name="fuel" className="quick-hub__icon" /><strong>Rifornimento rapido</strong><span>Inserisci prezzo/litro e costo totale</span></button>
+              <button type="button" className="quick-hub__card" onClick={() => requestVehicleAction({ kind: "quickCharge" })}><ActionGridIcon name="bolt" className="quick-hub__icon" /><strong>Ricarica elettrica</strong><span>Inserisci €/kWh e costo totale</span></button>
             </div>
             <div className="quick-hub__hint">I km vengono presi automaticamente dal contachilometri del veicolo.</div>
           </section>
+        )}
+
+        {!showBackup && !showManageVehicles && !openVehicle && mainTab === "impostazioni" && (
+          <SettingsScreen
+            onClose={() => setMainTab("garage")}
+            onOpenBackup={() => setShowBackup(true)}
+            onOpenTireCalc={() => setShowTireCalc(true)}
+            theme={theme}
+            onToggleTheme={handleToggleTheme}
+          />
         )}
 
         {!showBackup && !showManageVehicles && !openVehicle && mainTab !== "movimenti" && mainTab !== "impostazioni" && (
@@ -621,7 +630,7 @@ export default function App() {
             onQuickFuel={() => requestVehicleAction({ kind: "quickFuel" })}
             onQuickCharge={() => requestVehicleAction({ kind: "quickCharge" })}
             onQuickKm={(vehicle) => setQuickKmVehicle(vehicle)}
-            onOpenMenu={() => { setMainTab("impostazioni"); setShowSettings(true); }}
+            onOpenMenu={() => setMainTab("impostazioni")}
             onOpenReminder={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
             onOpenReminders={() => requestVehicleAction({ kind: "navigate", tab: "scadenze" })}
             onOpenMaintenance={() => requestVehicleAction({ kind: "navigate", tab: "manutenzioni" })}
@@ -685,16 +694,6 @@ export default function App() {
           vehicle={quickKmVehicle}
           onSave={handleQuickKmSave}
           onClose={() => setQuickKmVehicle(null)}
-        />
-      )}
-
-      {showSettings && (
-        <SettingsScreen
-          onClose={() => setShowSettings(false)}
-          onOpenBackup={() => setShowBackup(true)}
-          onOpenTireCalc={() => setShowTireCalc(true)}
-          theme={theme}
-          onToggleTheme={handleToggleTheme}
         />
       )}
 

@@ -6,10 +6,10 @@ import { formatDistance, kmToDisplayDistance, type DistanceUnit } from "../utils
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { FREE_VEHICLE_LIMIT } from "../services/billing/useProStatus";
 import VehicleDashboardCluster from "./VehicleDashboardCluster";
-import VehicleBodyIcon from "./VehicleBodyIcon";
 import VehicleGaugeCluster from "./VehicleGaugeCluster";
 import TopAppBar from "./TopAppBar";
 import UpcomingReminders from "./UpcomingReminders";
+import ActionGridIcon from "./ActionGridIcon";
 
 interface Props {
   vehicles: Vehicle[];
@@ -107,7 +107,6 @@ export default function Dashboard({
   onOpenMaintenance,
   onOpenStats,
   onOpenDocuments,
-  onOpenPremium,
   onOpenKmHistory,
 }: Props) {
   const { t, i18n } = useTranslation();
@@ -130,18 +129,10 @@ export default function Dashboard({
         onOpenNotifications={onOpenReminders}
       />
 
-      {!isPro && (
-        <button type="button" className="dash-pro-banner" onClick={onOpenPremium}>
-          <span>⭐ {t("premium.topbarCta", "Passa a Pro")}</span>
-          <span className="dash-pro-banner__chevron">›</span>
-        </button>
-      )}
-
       {primaryVehicle && (
         <section className="dash-featured-vehicle" onClick={() => onOpenVehicle(primaryVehicle.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onOpenVehicle(primaryVehicle.id)}>
           <div className="dash-featured-vehicle__photo">
             <span className="dash-featured-vehicle__badge">{t("dashboardGarage.primary", "PRINCIPALE")}</span>
-            <VehicleBodyIcon bodyType={primaryVehicle.bodyType ?? "hatchback"} />
           </div>
           <div className="dash-featured-vehicle__info">
             <div>
@@ -200,28 +191,28 @@ export default function Dashboard({
       {activeVehicles.length > 0 && (
         <section className="dash-action-grid">
           <button type="button" className="dash-action-grid__item dash-action-grid__item--highlight" onClick={onQuickFuel}>
-            <span className="dash-action-grid__icon">⛽</span>
+            <ActionGridIcon name="fuel" className="dash-action-grid__icon dash-action-grid__icon--green" />
             <strong>{t("dashboardGarage.quickAction", "AZIONE RAPIDA")}</strong>
             <span>{t("dashboardGarage.fuel", "Rifornimento")}</span>
           </button>
           <button type="button" className="dash-action-grid__item" onClick={onOpenMaintenance}>
-            <span className="dash-action-grid__icon">🔧</span>
+            <ActionGridIcon name="wrench" className="dash-action-grid__icon dash-action-grid__icon--orange" />
             <span>{t("bottomNav.maintenance", "Manutenzione")}</span>
           </button>
           <button type="button" className="dash-action-grid__item" onClick={onOpenStats}>
-            <span className="dash-action-grid__icon">📊</span>
+            <ActionGridIcon name="chart" className="dash-action-grid__icon dash-action-grid__icon--blue" />
             <span>{t("bottomNav.stats", "Statistiche")}</span>
           </button>
           <button type="button" className="dash-action-grid__item" onClick={onOpenReminders}>
-            <span className="dash-action-grid__icon">📅</span>
+            <ActionGridIcon name="calendar" className="dash-action-grid__icon dash-action-grid__icon--green" />
             <span>{t("dashboardGarage.deadlines", "Scadenze")}</span>
           </button>
           <button type="button" className="dash-action-grid__item" onClick={onOpenDocuments}>
-            <span className="dash-action-grid__icon">📁</span>
+            <ActionGridIcon name="folder" className="dash-action-grid__icon dash-action-grid__icon--yellow" />
             <span>{t("dashboardGarage.documents", "Documenti")}</span>
           </button>
           <button type="button" className="dash-action-grid__item" onClick={onOpenReminders}>
-            <span className="dash-action-grid__icon">🔔</span>
+            <ActionGridIcon name="bell" className="dash-action-grid__icon dash-action-grid__icon--red" />
             <span>{t("dashboardGarage.reminders", "Promemoria")}</span>
           </button>
         </section>
