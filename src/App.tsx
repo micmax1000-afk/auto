@@ -93,6 +93,15 @@ export default function App() {
   const [quickKmVehicle, setQuickKmVehicle] = useState<Vehicle | null>(null);
   const [kmHistoryVehicleId, setKmHistoryVehicleId] = useState<string | null>(null);
 
+  // Applica il tema al <html> e alla barra di stato del browser subito
+  // all'avvio: senza questo, il tema salvato/di sistema resta "scritto"
+  // solo nello stato React finché l'utente non tocca il selettore in
+  // Impostazioni, e l'app parte sempre con lo stile scuro di default.
+  useEffect(() => {
+    applyTheme(theme);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleToggleTheme() {
     const next: Theme = theme === "dark" ? "light" : "dark";
     setTheme(next);

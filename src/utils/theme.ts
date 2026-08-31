@@ -32,7 +32,7 @@ export function getInitialTheme(): Theme {
 
 const THEME_COLORS: Record<Theme, string> = {
   dark: "#0a0c0f",
-  light: "#f2ecdd",
+  light: "#ffffff",
 };
 
 export function applyTheme(theme: Theme): void {

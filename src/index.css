@@ -1897,7 +1897,6 @@ textarea {
     url("/images/app-background.jpg");
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
 }
 
 :root[data-theme="light"] .dashboard {

@@ -22,6 +22,7 @@ import MaintenanceList from "./MaintenanceList";
 import MaintenanceOverview from "./MaintenanceOverview";
 import PremiumScreen from "./PremiumScreen";
 import CategoryIcon from "./CategoryIcon";
+import ActionGridIcon from "./ActionGridIcon";
 import ExpenseForm from "./ExpenseForm";
 import ExpenseList from "./ExpenseList";
 import ReminderForm from "./ReminderForm";
@@ -494,7 +495,12 @@ export default function VehicleDetail({
             </div>
             <div className="stat-row stat-row--secondary">
               <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">📏</div>
+                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <rect x="2" y="9" width="20" height="6" rx="1" transform="rotate(-45 12 12)" />
+                    <path d="M8 12l1.5 1.5M11 9l1.5 1.5M14 6l1.5 1.5" />
+                  </svg>
+                </div>
                 <div>
                   <span className="stat-chip__label">{t("summary.distance")}</span>
                   <span className="stat-chip__value">
@@ -503,7 +509,9 @@ export default function VehicleDetail({
                 </div>
               </div>
               <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">⛽</div>
+                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">
+                  <ActionGridIcon name="fuel" />
+                </div>
                 <div>
                   <span className="stat-chip__label">{t("summary.consumption")}</span>
                   <span className="stat-chip__value">
@@ -512,7 +520,9 @@ export default function VehicleDetail({
                 </div>
               </div>
               <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">⚡</div>
+                <div className="record-card__icon record-card__icon--cyan record-card__icon--sm">
+                  <ActionGridIcon name="bolt" />
+                </div>
                 <div>
                   <span className="stat-chip__label">{t("summary.energy")}</span>
                   <span className="stat-chip__value">
@@ -521,7 +531,11 @@ export default function VehicleDetail({
                 </div>
               </div>
               <div className="stat-chip stat-chip--icon">
-                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">€/</div>
+                <div className="record-card__icon record-card__icon--amber record-card__icon--sm">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M17 8a5 5 0 1 0 0 8M6 10h6M6 14h5" />
+                  </svg>
+                </div>
                 <div>
                   <span className="stat-chip__label">{t("summary.averageEnergyPrice")}</span>
                   <span className="stat-chip__value">
