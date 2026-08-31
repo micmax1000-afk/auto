@@ -3086,6 +3086,30 @@ textarea {
   font-size: 0.85rem;
 }
 
+.dash-featured-vehicle__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.dash-featured-vehicle__meta span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.15rem 0.5rem;
+}
+
+.dash-featured-vehicle__notes {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.3;
+}
+
 .dash-featured-vehicle__edit {
   background: none;
   border: none;

@@ -111,6 +111,12 @@ export default function Dashboard({
                         ✎
                       </button>
                     </p>
+                    <div className="dash-featured-vehicle__meta">
+                      <span>{t(`fuelType.${v.fuelType}`)}</span>
+                      {v.year && <span>{v.year}</span>}
+                      {v.plate && <span>{v.plate}</span>}
+                    </div>
+                    {v.notes && <p className="dash-featured-vehicle__notes">{v.notes}</p>}
                   </div>
                   <span className="dash-featured-vehicle__chevron">›</span>
                 </div>
