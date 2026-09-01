@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import type { Vehicle, FuelEntry, ChargingEntry, MaintenanceEntry, ExpenseEntry, Reminder } from "./types";
 import {
@@ -32,22 +32,26 @@ import { applyTheme, getInitialTheme, setStoredTheme, type Theme } from "./utils
 import { isRtlLanguage } from "./i18n";
 import VehicleCard from "./components/VehicleCard";
 import VehicleForm from "./components/VehicleForm";
-import VehicleDetail from "./components/VehicleDetail";
-import QuickKmUpdate from "./components/QuickKmUpdate";
-import BackupPanel from "./components/BackupPanel";
-import SettingsScreen from "./components/SettingsScreen";
-import UtilitiesScreen from "./components/UtilitiesScreen";
 import Dashboard from "./components/Dashboard";
 import BottomTabBar, { type TabId } from "./components/BottomTabBar";
-import PremiumScreen from "./components/PremiumScreen";
-import TireCalculator from "./components/TireCalculator";
 import VehiclePickerModal from "./components/VehiclePickerModal";
 import Onboarding from "./components/Onboarding";
 import { getMeta, setMeta } from "./utils/db";
 import QuickFuelForm from "./components/QuickFuelForm";
 import QuickChargeForm from "./components/QuickChargeForm";
-import KmHistory from "./components/KmHistory";
 import { useProStatus, FREE_VEHICLE_LIMIT } from "./services/billing/useProStatus";
+
+// Schermate raggiunte solo dopo un'azione dell'utente (mai visibili al primo
+// avvio): caricate solo quando servono davvero, invece di appesantire il
+// bundle iniziale che ogni utente scarica per aprire semplicemente il Garage.
+const VehicleDetail = lazy(() => import("./components/VehicleDetail"));
+const QuickKmUpdate = lazy(() => import("./components/QuickKmUpdate"));
+const BackupPanel = lazy(() => import("./components/BackupPanel"));
+const SettingsScreen = lazy(() => import("./components/SettingsScreen"));
+const UtilitiesScreen = lazy(() => import("./components/UtilitiesScreen"));
+const PremiumScreen = lazy(() => import("./components/PremiumScreen"));
+const TireCalculator = lazy(() => import("./components/TireCalculator"));
+const KmHistory = lazy(() => import("./components/KmHistory"));
 
 // Mappa il tab della bottom bar alla scheda di dettaglio veicolo da aprire
 type DetailTabTarget = "live" | "rifornimenti" | "manutenzioni" | "spese" | "scadenze" | "tragitto" | "riepilogo";
@@ -62,6 +66,14 @@ const MAIN_TAB_TO_DETAIL_TAB: Record<"manutenzione" | "statistiche" | "movimenti
   statistiche: "riepilogo",
   movimenti: "rifornimenti",
 };
+
+function LazyFallback() {
+  return (
+    <div className="app-loading">
+      <div className="app-loading__spinner" />
+    </div>
+  );
+}
 
 export default function App() {
   const { t, i18n } = useTranslation();
@@ -473,21 +485,23 @@ export default function App() {
         key={`${mainTab}-${showBackup ? "backup" : "app"}-${openVehicleId ?? "list"}`}
       >
         {showBackup && (
-          <section>
+          <section style={{ paddingBottom: "3rem" }}>
             <div className="section-head">
               <h1>{t("backup.title")}</h1>
-              <button type="button" className="btn btn--ghost" onClick={() => setShowBackup(false)}>
+              <button type="button" className="btn btn--ghost" onClick={() => { setShowBackup(false); setMainTab("impostazioni"); }}>
                 {isRtlLanguage(i18n.language) ? "→ " : "← "}
-                {t("detail.back")}
+                {t("settingsScreen.title")}
               </button>
             </div>
-            <BackupPanel
-              vehicles={vehicles}
-              fuelEntries={fuelEntries}
-              maintenanceEntries={maintenanceEntries}
-              expenseEntries={expenseEntries}
-              onRestored={reloadAll}
-            />
+            <Suspense fallback={<LazyFallback />}>
+              <BackupPanel
+                vehicles={vehicles}
+                fuelEntries={fuelEntries}
+                maintenanceEntries={maintenanceEntries}
+                expenseEntries={expenseEntries}
+                onRestored={reloadAll}
+              />
+            </Suspense>
           </section>
         )}
 
@@ -585,27 +599,31 @@ export default function App() {
         )}
 
         {!showBackup && !showManageVehicles && !openVehicle && !showUtilities && mainTab === "impostazioni" && (
-          <SettingsScreen
-            onClose={() => setMainTab("garage")}
-            onOpenBackup={() => setShowBackup(true)}
-            theme={theme}
-            onToggleTheme={handleToggleTheme}
-          />
+          <Suspense fallback={<LazyFallback />}>
+            <SettingsScreen
+              onClose={() => setMainTab("garage")}
+              onOpenBackup={() => setShowBackup(true)}
+              theme={theme}
+              onToggleTheme={handleToggleTheme}
+            />
+          </Suspense>
         )}
 
         {!showBackup && !showManageVehicles && !openVehicle && showUtilities && (
-          <UtilitiesScreen
-            onClose={() => setShowUtilities(false)}
-            onOpenReminders={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "scadenze" }); }}
-            onOpenExpenses={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "spese" }); }}
-            onOpenTireCalc={() => setShowTireCalc(true)}
-            onOpenCommute={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "tragitto" }); }}
-            onOpenKmHistory={() => {
-              setShowUtilities(false);
-              const target = vehicles.find((v) => !v.archived);
-              if (target) setKmHistoryVehicleId(target.id);
-            }}
-          />
+          <Suspense fallback={<LazyFallback />}>
+            <UtilitiesScreen
+              onClose={() => setShowUtilities(false)}
+              onOpenReminders={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "scadenze" }); }}
+              onOpenExpenses={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "spese" }); }}
+              onOpenTireCalc={() => setShowTireCalc(true)}
+              onOpenCommute={() => { setShowUtilities(false); requestVehicleAction({ kind: "navigate", tab: "tragitto" }); }}
+              onOpenKmHistory={() => {
+                setShowUtilities(false);
+                const target = vehicles.find((v) => !v.archived);
+                if (target) setKmHistoryVehicleId(target.id);
+              }}
+            />
+          </Suspense>
         )}
 
         {!showBackup && !showManageVehicles && !openVehicle && !showUtilities && mainTab !== "impostazioni" && (
@@ -636,32 +654,34 @@ export default function App() {
         )}
 
         {!showBackup && openVehicle && (
-          <VehicleDetail
-            vehicle={openVehicle}
-            fuelEntries={fuelEntries.filter((e) => e.vehicleId === openVehicle.id)}
-            chargingEntries={chargingEntries.filter((e) => e.vehicleId === openVehicle.id)}
-            maintenanceEntries={maintenanceEntries.filter((e) => e.vehicleId === openVehicle.id)}
-            expenseEntries={expenseEntries.filter((e) => e.vehicleId === openVehicle.id)}
-            reminders={reminders.filter((r) => r.vehicleId === openVehicle.id)}
-            initialTab={detailInitialTab}
-            restrictToTab={detailInitialTab}
-            onBack={handleBackFromDetail}
-            onSaveFuel={handleSaveFuel}
-            onDeleteFuel={handleDeleteFuel}
-            onSaveCharging={handleSaveCharging}
-            onDeleteCharging={handleDeleteCharging}
-            onAddMaintenance={handleAddMaintenance}
-            onDeleteMaintenance={handleDeleteMaintenance}
-            onAddExpense={handleAddExpense}
-            onDeleteExpense={handleDeleteExpense}
-            onAddReminder={handleAddReminder}
-            onToggleReminder={handleToggleReminder}
-            onDeleteReminder={handleDeleteReminder}
-          />
+          <Suspense fallback={<LazyFallback />}>
+            <VehicleDetail
+              vehicle={openVehicle}
+              fuelEntries={fuelEntries.filter((e) => e.vehicleId === openVehicle.id)}
+              chargingEntries={chargingEntries.filter((e) => e.vehicleId === openVehicle.id)}
+              maintenanceEntries={maintenanceEntries.filter((e) => e.vehicleId === openVehicle.id)}
+              expenseEntries={expenseEntries.filter((e) => e.vehicleId === openVehicle.id)}
+              reminders={reminders.filter((r) => r.vehicleId === openVehicle.id)}
+              initialTab={detailInitialTab}
+              restrictToTab={detailInitialTab}
+              onBack={handleBackFromDetail}
+              onSaveFuel={handleSaveFuel}
+              onDeleteFuel={handleDeleteFuel}
+              onSaveCharging={handleSaveCharging}
+              onDeleteCharging={handleDeleteCharging}
+              onAddMaintenance={handleAddMaintenance}
+              onDeleteMaintenance={handleDeleteMaintenance}
+              onAddExpense={handleAddExpense}
+              onDeleteExpense={handleDeleteExpense}
+              onAddReminder={handleAddReminder}
+              onToggleReminder={handleToggleReminder}
+              onDeleteReminder={handleDeleteReminder}
+            />
+          </Suspense>
         )}
       </main>
 
-      {!showBackup && !showManageVehicles && (
+      {!showManageVehicles && (
         <BottomTabBar active={mainTab} onChange={handleMainTabChange} urgentCount={urgentTotalCount} />
       )}
 
@@ -682,23 +702,31 @@ export default function App() {
       )}
 
       {quickKmVehicle && (
-        <QuickKmUpdate
-          vehicle={quickKmVehicle}
-          onSave={handleQuickKmSave}
-          onClose={() => setQuickKmVehicle(null)}
-        />
+        <Suspense fallback={<LazyFallback />}>
+          <QuickKmUpdate
+            vehicle={quickKmVehicle}
+            onSave={handleQuickKmSave}
+            onClose={() => setQuickKmVehicle(null)}
+          />
+        </Suspense>
       )}
 
       {showPremium && (
-        <PremiumScreen
-          onClose={() => {
-            setShowPremium(false);
-            refreshProStatus();
-          }}
-        />
+        <Suspense fallback={<LazyFallback />}>
+          <PremiumScreen
+            onClose={() => {
+              setShowPremium(false);
+              refreshProStatus();
+            }}
+          />
+        </Suspense>
       )}
 
-      {showTireCalc && <TireCalculator onClose={() => setShowTireCalc(false)} />}
+      {showTireCalc && (
+        <Suspense fallback={<LazyFallback />}>
+          <TireCalculator onClose={() => setShowTireCalc(false)} />
+        </Suspense>
+      )}
 
       {pendingVehicleAction && (
         <VehiclePickerModal
@@ -713,16 +741,18 @@ export default function App() {
           const v = vehicles.find((veh) => veh.id === kmHistoryVehicleId);
           if (!v) return null;
           return (
-            <KmHistory
-              vehicle={v}
-              fuelEntries={fuelEntries.filter((f) => f.vehicleId === v.id)}
-              chargingEntries={chargingEntries.filter((c) => c.vehicleId === v.id)}
-              onBack={() => setKmHistoryVehicleId(null)}
-              onUpdateKm={() => {
-                setKmHistoryVehicleId(null);
-                setQuickKmVehicle(v);
-              }}
-            />
+            <Suspense fallback={<LazyFallback />}>
+              <KmHistory
+                vehicle={v}
+                fuelEntries={fuelEntries.filter((f) => f.vehicleId === v.id)}
+                chargingEntries={chargingEntries.filter((c) => c.vehicleId === v.id)}
+                onBack={() => setKmHistoryVehicleId(null)}
+                onUpdateKm={() => {
+                  setKmHistoryVehicleId(null);
+                  setQuickKmVehicle(v);
+                }}
+              />
+            </Suspense>
           );
         })()}
 

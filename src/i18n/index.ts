@@ -1,16 +1,5 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import it from "./locales/it.json";
-import en from "./locales/en.json";
-import es from "./locales/es.json";
-import fr from "./locales/fr.json";
-import pt from "./locales/pt.json";
-import ar from "./locales/ar.json";
-import de from "./locales/de.json";
-import ru from "./locales/ru.json";
-import id from "./locales/id.json";
-import hi from "./locales/hi.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "it", label: "Italiano" },
@@ -25,6 +14,10 @@ export const SUPPORTED_LANGUAGES = [
   { code: "ar", label: "العربية" },
 ];
 
+const SUPPORTED_CODES = SUPPORTED_LANGUAGES.map((l) => l.code);
+const FALLBACK_LNG = "it";
+const STORAGE_KEY = "diario-auto:language";
+
 export const RTL_LANGUAGES = ["ar"];
 
 export function isRtlLanguage(lang: string): boolean {
@@ -38,37 +31,85 @@ function applyDocumentDirection(lang: string) {
   document.documentElement.dir = isRtlLanguage(code) ? "rtl" : "ltr";
 }
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources: {
-      it: { translation: it },
-      en: { translation: en },
-      es: { translation: es },
-      fr: { translation: fr },
-      pt: { translation: pt },
-      ar: { translation: ar },
-      de: { translation: de },
-      ru: { translation: ru },
-      id: { translation: id },
-      hi: { translation: hi },
-    },
-    fallbackLng: "it",
-    supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
-    interpolation: {
-      escapeValue: false, // React già gestisce l'escaping
-    },
-    detection: {
-      // preferenza salvata manualmente > lingua del dispositivo/browser
-      order: ["localStorage", "navigator"],
-      lookupLocalStorage: "diario-auto:language",
-      caches: ["localStorage"],
-    },
-  });
+// Ogni lingua è ~30-50KB di JSON: importarle tutte sempre appesantiva il
+// bundle iniziale per ogni utente, indipendentemente dalla lingua che usa
+// davvero. Ora si carica solo quella che serve, più l'italiano come
+// fallback se diverso, e le altre solo se l'utente le seleziona a mano.
+const LOCALE_LOADERS: Record<string, () => Promise<{ default: Record<string, unknown> }>> = {
+  it: () => import("./locales/it.json"),
+  en: () => import("./locales/en.json"),
+  es: () => import("./locales/es.json"),
+  fr: () => import("./locales/fr.json"),
+  pt: () => import("./locales/pt.json"),
+  ar: () => import("./locales/ar.json"),
+  de: () => import("./locales/de.json"),
+  ru: () => import("./locales/ru.json"),
+  id: () => import("./locales/id.json"),
+  hi: () => import("./locales/hi.json"),
+};
 
-// imposta subito la direzione corretta e la aggiorna a ogni cambio lingua
-applyDocumentDirection(i18n.language);
-i18n.on("languageChanged", applyDocumentDirection);
+function detectInitialLanguage(): string {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored && SUPPORTED_CODES.includes(stored)) return stored;
+  } catch {
+    // localStorage non disponibile (privacy mode ecc.): si passa oltre
+  }
+  const navLang = (navigator.language || "it").split("-")[0];
+  return SUPPORTED_CODES.includes(navLang) ? navLang : FALLBACK_LNG;
+}
+
+/** Carica (se non già presente) il bundle di una lingua e lo registra in i18next. */
+export async function loadLanguage(code: string): Promise<void> {
+  if (!SUPPORTED_CODES.includes(code)) return;
+  if (i18n.hasResourceBundle(code, "translation")) return;
+  const loader = LOCALE_LOADERS[code];
+  if (!loader) return;
+  const mod = await loader();
+  i18n.addResourceBundle(code, "translation", mod.default);
+}
+
+/** Cambia lingua caricando prima il bundle se necessario. Da usare al posto di i18n.changeLanguage diretto. */
+export async function changeLanguage(code: string): Promise<void> {
+  await loadLanguage(code);
+  try {
+    window.localStorage.setItem(STORAGE_KEY, code);
+  } catch {
+    // privacy mode: la preferenza semplicemente non persiste tra sessioni
+  }
+  await i18n.changeLanguage(code);
+}
+
+let initPromise: Promise<typeof i18n> | null = null;
+
+/** Inizializza i18next caricando solo la lingua iniziale (+ fallback italiano). Va atteso prima del primo render. */
+export function initI18n(): Promise<typeof i18n> {
+  if (initPromise) return initPromise;
+
+  initPromise = (async () => {
+    const initialLang = detectInitialLanguage();
+    const codesToLoad = initialLang === FALLBACK_LNG ? [FALLBACK_LNG] : [initialLang, FALLBACK_LNG];
+    const loaded = await Promise.all(
+      codesToLoad.map(async (code) => [code, (await LOCALE_LOADERS[code]()).default] as const),
+    );
+
+    await i18n.use(initReactI18next).init({
+      resources: Object.fromEntries(loaded.map(([code, data]) => [code, { translation: data }])),
+      lng: initialLang,
+      fallbackLng: FALLBACK_LNG,
+      supportedLngs: SUPPORTED_CODES,
+      interpolation: {
+        escapeValue: false, // React già gestisce l'escaping
+      },
+    });
+
+    applyDocumentDirection(i18n.language);
+    i18n.on("languageChanged", applyDocumentDirection);
+
+    return i18n;
+  })();
+
+  return initPromise;
+}
 
 export default i18n;

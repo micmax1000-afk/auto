@@ -538,11 +538,13 @@ textarea {
   flex-direction: column;
   gap: 0.3rem;
   flex: 1;
+  min-width: 0;
 }
 
 .field-row {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .field label {
@@ -562,6 +564,8 @@ textarea {
   padding: 0.55rem 0.7rem;
   font-size: 0.95rem;
   color: var(--text);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .field input:focus,

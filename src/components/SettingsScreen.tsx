@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { CURRENCIES } from "../utils/settings";
 import type { Theme } from "../utils/theme";
-import { SUPPORTED_LANGUAGES } from "../i18n";
+import { SUPPORTED_LANGUAGES, changeLanguage } from "../i18n";
 import { isGoogleDriveConfigured } from "../services/googleDrive/config";
 import QuickEntryHeader from "./QuickEntryHeader";
 
@@ -58,7 +58,7 @@ export default function SettingsScreen({ onClose, onOpenBackup, theme, onToggleT
                 key={lang.code}
                 type="button"
                 className={`settings-chip ${i18n.language.split("-")[0] === lang.code ? "is-active" : ""}`}
-                onClick={() => { i18n.changeLanguage(lang.code); setOpenRow(null); }}
+                onClick={() => { changeLanguage(lang.code); setOpenRow(null); }}
               >
                 {lang.label}
               </button>
@@ -115,7 +115,7 @@ export default function SettingsScreen({ onClose, onOpenBackup, theme, onToggleT
         )}
 
         {/* Backup */}
-        <div className="settings-row" onClick={() => { onClose(); onOpenBackup(); }} role="button" tabIndex={0}>
+        <div className="settings-row" onClick={onOpenBackup} role="button" tabIndex={0}>
           <span className="settings-row__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d={ROW_ICONS.backup} /></svg></span>
           <span className="settings-row__label">{t("settingsScreen.backupSync")}</span>
           <span className={`settings-row__value ${backupActive ? "is-positive" : ""}`}>
